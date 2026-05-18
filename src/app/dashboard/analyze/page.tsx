@@ -19,6 +19,18 @@ const modules = [
     key: "ner",
     label: "Named Entity Recognition",
   },
+  {
+    key: "summarize",
+    label: "Text Summarization",
+  },
+  {
+    key: "readability",
+    label: "Readability Analysis",
+  },
+  {
+    key: "keywords",
+    label: "Keyword Extraction",
+  },
 ];
 
 type SentimentResult = {
@@ -34,6 +46,27 @@ type EmotionResult = {
 type EntityResult = {
   text: string;
   label: string;
+};
+
+type SummaryResult = {
+  summary: string;
+};
+
+type ReadabilityResult = {
+  flesch_reading_ease: number;
+  flesch_kincaid_grade: number;
+  gunning_fog: number;
+  smog_index: number;
+  automated_readability_index: number;
+  coleman_liau_index: number;
+  sentence_count: number;
+  word_count: number;
+  difficult_words: number;
+};
+
+type KeywordResult = {
+  keyword: string;
+  score: number;
 };
 
 export default function AnalyzePage() {
@@ -58,7 +91,14 @@ export default function AnalyzePage() {
       setResult(response.data);
 
       await saveAnalysis({
-        type: selectedModule.toUpperCase(),
+        type:
+          selectedModule === "summarize"
+            ? "SUMMARY"
+            : selectedModule === "readability"
+            ? "READABILITY"
+            : selectedModule === "keywords"
+            ? "KEYWORDS"
+            : selectedModule.toUpperCase(),
         inputText: text,
         result: response.data,
         language: "English",
@@ -127,7 +167,8 @@ export default function AnalyzePage() {
 
           {selectedModule === "sentiment" &&
             result &&
-            !Array.isArray(result) && (
+            !Array.isArray(result) &&
+            result.label && (
               <div className="mt-8 rounded-2xl border p-6">
                 <h3 className="text-xl font-semibold">
                   Sentiment Result
@@ -228,6 +269,142 @@ export default function AnalyzePage() {
                         <div className="rounded-full bg-primary/10 px-4 py-2 text-xs font-medium text-primary">
                           {entity.label}
                         </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+          {selectedModule === "summarize" &&
+            result &&
+            !Array.isArray(result) &&
+            result.summary && (
+              <div className="mt-8 rounded-2xl border p-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-semibold">
+                    Generated Summary
+                  </h3>
+
+                  <div className="rounded-full bg-primary/10 px-4 py-2 text-xs font-medium text-primary">
+                    AI Summary
+                  </div>
+                </div>
+
+                <div className="mt-6 rounded-xl bg-muted/50 p-6">
+                  <p className="leading-relaxed text-muted-foreground">
+                    {result.summary}
+                  </p>
+                </div>
+              </div>
+            )}
+
+          {selectedModule === "readability" &&
+            result &&
+            !Array.isArray(result) &&
+            result.flesch_reading_ease !== undefined && (
+              <div className="mt-8 rounded-2xl border p-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-semibold">
+                    Readability Analysis
+                  </h3>
+
+                  <div className="rounded-full bg-primary/10 px-4 py-2 text-xs font-medium text-primary">
+                    Academic Metrics
+                  </div>
+                </div>
+
+                <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  <div className="rounded-xl border p-5">
+                    <p className="text-sm text-muted-foreground">
+                      Reading Ease
+                    </p>
+
+                    <h4 className="mt-3 text-3xl font-bold">
+                      {result.flesch_reading_ease}
+                    </h4>
+                  </div>
+
+                  <div className="rounded-xl border p-5">
+                    <p className="text-sm text-muted-foreground">
+                      Grade Level
+                    </p>
+
+                    <h4 className="mt-3 text-3xl font-bold">
+                      {result.flesch_kincaid_grade}
+                    </h4>
+                  </div>
+
+                  <div className="rounded-xl border p-5">
+                    <p className="text-sm text-muted-foreground">
+                      Gunning Fog
+                    </p>
+
+                    <h4 className="mt-3 text-3xl font-bold">
+                      {result.gunning_fog}
+                    </h4>
+                  </div>
+
+                  <div className="rounded-xl border p-5">
+                    <p className="text-sm text-muted-foreground">
+                      Sentence Count
+                    </p>
+
+                    <h4 className="mt-3 text-3xl font-bold">
+                      {result.sentence_count}
+                    </h4>
+                  </div>
+
+                  <div className="rounded-xl border p-5">
+                    <p className="text-sm text-muted-foreground">
+                      Word Count
+                    </p>
+
+                    <h4 className="mt-3 text-3xl font-bold">
+                      {result.word_count}
+                    </h4>
+                  </div>
+
+                  <div className="rounded-xl border p-5">
+                    <p className="text-sm text-muted-foreground">
+                      Difficult Words
+                    </p>
+
+                    <h4 className="mt-3 text-3xl font-bold">
+                      {result.difficult_words}
+                    </h4>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          {selectedModule === "keywords" &&
+            Array.isArray(result) && (
+              <div className="mt-8 rounded-2xl border p-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-semibold">
+                    Extracted Keywords
+                  </h3>
+
+                  <div className="rounded-full bg-primary/10 px-4 py-2 text-xs font-medium text-primary">
+                    Semantic Keywords
+                  </div>
+                </div>
+
+                <div className="mt-6 flex flex-wrap gap-3">
+                  {result.map((keyword: KeywordResult) => (
+                    <div
+                      key={keyword.keyword}
+                      className="rounded-full border px-4 py-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="font-medium">
+                          {keyword.keyword}
+                        </span>
+
+                        <span className="text-xs text-muted-foreground">
+                          {(keyword.score * 100).toFixed(1)}%
+                        </span>
                       </div>
                     </div>
                   ))}

@@ -6,6 +6,9 @@ export async function analyzeText(
     sentiment: "sentiment",
     emotion: "emotion",
     ner: "ner",
+    summarize: "summarize",
+    readability: "readability",
+    keywords: "keywords",
   };
 
   const endpoint = endpointMap[type];
