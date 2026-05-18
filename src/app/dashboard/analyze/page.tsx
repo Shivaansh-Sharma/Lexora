@@ -31,6 +31,10 @@ const modules = [
     key: "keywords",
     label: "Keyword Extraction",
   },
+  {
+    key: "language",
+    label: "Language Detection",
+  },
 ];
 
 type SentimentResult = {
@@ -69,6 +73,12 @@ type KeywordResult = {
   score: number;
 };
 
+type LanguageResult = {
+  language_code: string;
+  language: string;
+  confidence: number;
+};
+
 export default function AnalyzePage() {
   const [selectedModule, setSelectedModule] =
     useState("sentiment");
@@ -98,6 +108,8 @@ export default function AnalyzePage() {
             ? "READABILITY"
             : selectedModule === "keywords"
             ? "KEYWORDS"
+            : selectedModule === "language"
+            ? "TOPIC"
             : selectedModule.toUpperCase(),
         inputText: text,
         result: response.data,
@@ -408,6 +420,49 @@ export default function AnalyzePage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+          {selectedModule === "language" &&
+            result &&
+            !Array.isArray(result) &&
+            result.language && (
+              <div className="mt-8 rounded-2xl border p-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-semibold">
+                    Language Detection
+                  </h3>
+
+                  <div className="rounded-full bg-primary/10 px-4 py-2 text-xs font-medium text-primary">
+                    Multilingual AI
+                  </div>
+                </div>
+
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-xl border p-5">
+                    <p className="text-sm text-muted-foreground">
+                      Detected Language
+                    </p>
+
+                    <h4 className="mt-3 text-3xl font-bold">
+                      {result.language}
+                    </h4>
+
+                    <p className="mt-2 text-sm text-muted-foreground uppercase">
+                      {result.language_code}
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border p-5">
+                    <p className="text-sm text-muted-foreground">
+                      Confidence
+                    </p>
+
+                    <h4 className="mt-3 text-3xl font-bold">
+                      {(result.confidence * 100).toFixed(2)}%
+                    </h4>
+                  </div>
                 </div>
               </div>
             )}

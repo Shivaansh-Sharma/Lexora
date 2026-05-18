@@ -7,6 +7,7 @@ from app.routers.ner import router as ner_router
 from app.routers.summarization import router as summarization_router
 from app.routers.readability import router as readability_router
 from app.routers.keywords import router as keywords_router
+from app.routers.language import router as language_router
 
 app = FastAPI(title="Lexora AI Service")
 
@@ -24,3 +25,4 @@ app.include_router(ner_router)
 app.include_router(summarization_router)
 app.include_router(readability_router)
 app.include_router(keywords_router)
+app.include_router(language_router)

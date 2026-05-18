@@ -9,6 +9,7 @@ export async function analyzeText(
     summarize: "summarize",
     readability: "readability",
     keywords: "keywords",
+    language: "language",
   };
 
   const endpoint = endpointMap[type];
