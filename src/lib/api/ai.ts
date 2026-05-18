@@ -1,6 +1,20 @@
-export async function analyzeSentiment(text: string) {
+export async function analyzeText(
+  type: string,
+  text: string
+) {
+  const endpointMap: Record<string, string> = {
+    sentiment: "sentiment",
+    emotion: "emotion",
+  };
+
+  const endpoint = endpointMap[type];
+
+  if (!endpoint) {
+    throw new Error("Invalid analysis type");
+  }
+
   const response = await fetch(
-    "http://127.0.0.1:8000/analyze/sentiment",
+    `http://127.0.0.1:8000/analyze/${endpoint}`,
     {
       method: "POST",
       headers: {
@@ -13,7 +27,7 @@ export async function analyzeSentiment(text: string) {
   );
 
   if (!response.ok) {
-    throw new Error("Failed to analyze sentiment");
+    throw new Error("Analysis failed");
   }
 
   return response.json();

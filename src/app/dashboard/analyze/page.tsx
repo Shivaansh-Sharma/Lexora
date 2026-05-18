@@ -3,18 +3,18 @@
 import { useState } from "react";
 
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { analyzeSentiment } from "@/lib/api/ai";
+import { analyzeText } from "@/lib/api/ai";
 import { saveAnalysis } from "@/lib/api/analysis";
 
 const modules = [
-  "Sentiment Analysis",
-  "Emotion Analysis",
-  "NER",
-  "Summarization",
-  "Keywords",
-  "Readability",
-  "Topic Modeling",
-  "AI Detection",
+  {
+    key: "sentiment",
+    label: "Sentiment Analysis",
+  },
+  {
+    key: "emotion",
+    label: "Emotion Analysis",
+  },
 ];
 
 type SentimentResult = {
@@ -22,28 +22,38 @@ type SentimentResult = {
   score: number;
 };
 
+type EmotionResult = {
+  label: string;
+  score: number;
+};
+
 export default function AnalyzePage() {
+  const [selectedModule, setSelectedModule] =
+    useState("sentiment");
+
   const [text, setText] = useState("");
 
   const [loading, setLoading] = useState(false);
 
-  const [result, setResult] =
-    useState<SentimentResult | null>(null);
+  const [result, setResult] = useState<any>(null);
 
   async function handleAnalyze() {
     try {
       setLoading(true);
 
-const response = await analyzeSentiment(text);
+      const response = await analyzeText(
+        selectedModule,
+        text
+      );
 
-setResult(response.data);
+      setResult(response.data);
 
-await saveAnalysis({
-  type: "SENTIMENT",
-  inputText: text,
-  result: response.data,
-  language: "English",
-});
+      await saveAnalysis({
+        type: selectedModule.toUpperCase(),
+        inputText: text,
+        result: response.data,
+        language: "English",
+      });
     } catch (error) {
       console.error(error);
 
@@ -65,10 +75,17 @@ await saveAnalysis({
             <div className="mt-6 space-y-3">
               {modules.map((module) => (
                 <button
-                  key={module}
-                  className="w-full rounded-xl border px-4 py-3 text-left text-sm transition-colors hover:bg-muted"
+                  key={module.key}
+                  onClick={() =>
+                    setSelectedModule(module.key)
+                  }
+                  className={`w-full rounded-xl border px-4 py-3 text-left text-sm transition-colors ${
+                    selectedModule === module.key
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-muted"
+                  }`}
                 >
-                  {module}
+                  {module.label}
                 </button>
               ))}
             </div>
@@ -99,35 +116,81 @@ await saveAnalysis({
             {loading ? "Analyzing..." : "Analyze Text"}
           </button>
 
-          {result && (
-            <div className="mt-8 rounded-2xl border p-6">
-              <h3 className="text-xl font-semibold">
-                Sentiment Result
-              </h3>
+          {selectedModule === "sentiment" &&
+            result &&
+            !Array.isArray(result) && (
+              <div className="mt-8 rounded-2xl border p-6">
+                <h3 className="text-xl font-semibold">
+                  Sentiment Result
+                </h3>
 
-              <div className="mt-6 grid gap-4 md:grid-cols-2">
-                <div className="rounded-xl border p-4">
-                  <p className="text-sm text-muted-foreground">
-                    Label
-                  </p>
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-xl border p-4">
+                    <p className="text-sm text-muted-foreground">
+                      Label
+                    </p>
 
-                  <h4 className="mt-2 text-2xl font-bold">
-                    {result.label}
-                  </h4>
-                </div>
+                    <h4 className="mt-2 text-2xl font-bold">
+                      {result.label}
+                    </h4>
+                  </div>
 
-                <div className="rounded-xl border p-4">
-                  <p className="text-sm text-muted-foreground">
-                    Confidence
-                  </p>
+                  <div className="rounded-xl border p-4">
+                    <p className="text-sm text-muted-foreground">
+                      Confidence
+                    </p>
 
-                  <h4 className="mt-2 text-2xl font-bold">
-                    {(result.score * 100).toFixed(2)}%
-                  </h4>
+                    <h4 className="mt-2 text-2xl font-bold">
+                      {(result.score * 100).toFixed(2)}%
+                    </h4>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+
+          {selectedModule === "emotion" &&
+            Array.isArray(result) && (
+              <div className="mt-8 rounded-2xl border p-6">
+                <h3 className="text-xl font-semibold">
+                  Emotion Analysis
+                </h3>
+
+                <div className="mt-6 space-y-4">
+                  {result.map(
+                    (emotion: EmotionResult) => (
+                      <div
+                        key={emotion.label}
+                        className="space-y-2"
+                      >
+                        <div className="flex items-center justify-between">
+                          <p className="font-medium capitalize">
+                            {emotion.label}
+                          </p>
+
+                          <p className="text-sm text-muted-foreground">
+                            {(
+                              emotion.score * 100
+                            ).toFixed(2)}
+                            %
+                          </p>
+                        </div>
+
+                        <div className="h-3 overflow-hidden rounded-full bg-muted">
+                          <div
+                            className="h-full rounded-full bg-primary"
+                            style={{
+                              width: `${
+                                emotion.score * 100
+                              }%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            )}
         </div>
       </div>
     </DashboardShell>
