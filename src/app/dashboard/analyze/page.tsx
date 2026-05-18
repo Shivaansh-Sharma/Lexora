@@ -15,6 +15,10 @@ const modules = [
     key: "emotion",
     label: "Emotion Analysis",
   },
+  {
+    key: "ner",
+    label: "Named Entity Recognition",
+  },
 ];
 
 type SentimentResult = {
@@ -25,6 +29,11 @@ type SentimentResult = {
 type EmotionResult = {
   label: string;
   score: number;
+};
+
+type EntityResult = {
+  text: string;
+  label: string;
 };
 
 export default function AnalyzePage() {
@@ -188,6 +197,40 @@ export default function AnalyzePage() {
                       </div>
                     )
                   )}
+                </div>
+              </div>
+            )}
+
+          {selectedModule === "ner" &&
+            Array.isArray(result) && (
+              <div className="mt-8 rounded-2xl border p-6">
+                <h3 className="text-xl font-semibold">
+                  Named Entities
+                </h3>
+
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                  {result.map((entity: EntityResult) => (
+                    <div
+                      key={`${entity.text}-${entity.label}`}
+                      className="rounded-xl border p-5"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="text-lg font-semibold">
+                            {entity.text}
+                          </p>
+
+                          <p className="mt-2 text-sm text-muted-foreground">
+                            Extracted entity
+                          </p>
+                        </div>
+
+                        <div className="rounded-full bg-primary/10 px-4 py-2 text-xs font-medium text-primary">
+                          {entity.label}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

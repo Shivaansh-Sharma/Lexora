@@ -5,6 +5,7 @@ export async function analyzeText(
   const endpointMap: Record<string, string> = {
     sentiment: "sentiment",
     emotion: "emotion",
+    ner: "ner",
   };
 
   const endpoint = endpointMap[type];
