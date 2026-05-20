@@ -528,55 +528,7 @@ function handleDownloadCSV() {
   );
 }
 
-useEffect(() => {
-
-  async function loadAnalysis() {
-
-    const id =
-      searchParams.get(
-        "id"
-      );
-
-    if (!id) return;
-
-    try {
-
-      const data =
-        await getAnalysisById(
-          id
-        );
-
-      const analysis =
-        data.analysis;
-
-      setText(
-        analysis.inputText
-      );
-
-      setSelectedModule(
-        analysis.type
-          .toLowerCase()
-          .replaceAll(
-            "_",
-            "-"
-          )
-      );
-
-      setResult(
-        analysis.result
-          .analysis ||
-          analysis.result
-      );
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-    }
-  }
-
-}, []);
+ [];
 
 return (
 
