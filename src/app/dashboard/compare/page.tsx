@@ -6,6 +6,8 @@ import {
   useState,
 } from "react";
 
+import { Suspense } from "react";
+
 import jsPDF from "jspdf";
 
 import { toPng } from "html-to-image";
@@ -85,7 +87,7 @@ type ComparisonHistoryItem = {
   createdAt: string;
 };
 
-export default function ComparePage() {
+function ComparePageContent() {
 
   const reportRef =
     useRef<HTMLDivElement>(null);
@@ -1002,5 +1004,14 @@ fill="#e4e4e7"
         )}
       </div>
     </DashboardShell>
+  );
+}
+
+export default function ComparePage() {
+
+  return (
+    <Suspense fallback={<div />}>
+      <ComparePageContent />
+    </Suspense>
   );
 }
