@@ -1,4 +1,4 @@
-import { AnalysisCard } from "@/components/dashboard/analysis-card";
+import AnalysisCard from "@/components/dashboard/analysis-card";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { auth } from "@/lib/auth/auth";
 import { prisma } from "@/lib/db/prisma";
