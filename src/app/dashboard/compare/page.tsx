@@ -806,11 +806,6 @@ label={({ percent }) =>
     (percent || 0) * 100
   )}%`
 }
-labelStyle={{
-  fill: "#e4e4e7",
-  fontSize: 18,
-  fontWeight: 600,
-}}
 fill="#e4e4e7"
   labelLine={false}
 >
