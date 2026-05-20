@@ -530,6 +530,34 @@ function handleDownloadCSV() {
 
  [];
 
+ async function loadAnalysis(
+  id: string
+) {
+
+  try {
+
+    const response =
+      await fetch(
+        `/api/analysis/${id}`
+      );
+
+    if (
+      !response.ok
+    ) {
+      return;
+    }
+
+    const data =
+      await response.json();
+
+    console.log(data);
+
+  } catch (error) {
+
+    console.error(error);
+  }
+}
+
 return (
 
   <Suspense fallback={null}>
