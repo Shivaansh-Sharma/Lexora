@@ -170,7 +170,7 @@ export default function ReportsPage() {
 
         <div className="relative z-10">
 
-          <div className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-violet-300 backdrop-blur-xl">
+          <div className="inline-flex items-center rounded-full border border-violet-200/40 bg-white/40 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-violet-700 dark:border-white/10 dark:bg-white/5 dark:text-violet-300 backdrop-blur-xl">
 
             Unified Intelligence Reports
           </div>
