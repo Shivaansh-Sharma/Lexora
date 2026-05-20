@@ -27,6 +27,8 @@ model User {
   createdAt DateTime @default(now())
 
   analyses  Analysis[]
+
+  comparisons Comparison[]
 }
 
 model Analysis {
@@ -40,6 +42,21 @@ model Analysis {
 
   language    String?
   createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Comparison {
+  id        String   @id @default(cuid())
+
+  userId    String
+
+  text1     String   @db.Text
+  text2     String   @db.Text
+
+  result    Json
+
+  createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id])
 }

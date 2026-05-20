@@ -18,3 +18,22 @@ export async function saveAnalysis(data: {
 
   return response.json();
 }
+
+export async function getAnalysisById(
+  id: string
+) {
+
+  const response =
+    await fetch(
+      `/api/analysis/${id}/get`
+    );
+
+  if (!response.ok) {
+
+    throw new Error(
+      "Failed to fetch analysis"
+    );
+  }
+
+  return response.json();
+}

@@ -10,6 +10,10 @@ export async function analyzeText(
     readability: "readability",
     keywords: "keywords",
     language: "language",
+    topic: "topic",
+    grammar: "grammar",
+    "ai-detection": "ai-detection",
+    "internet-plagiarism": "internet-plagiarism",
   };
 
   const endpoint = endpointMap[type];
