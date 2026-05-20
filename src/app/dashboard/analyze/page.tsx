@@ -245,8 +245,33 @@ export default function AnalyzePage() {
 
   const reportRef = useRef<HTMLDivElement>(null);
 
+function SearchParamsHandler({
+  onLoad,
+}: {
+  onLoad: (
+    id: string | null
+  ) => void;
+}) {
+
   const searchParams =
-  useSearchParams();
+    useSearchParams();
+
+  useEffect(() => {
+
+    const id =
+      searchParams.get(
+        "id"
+      );
+
+    onLoad(id);
+
+  }, [
+    searchParams,
+    onLoad,
+  ]);
+
+  return null;
+}
 
 async function handleAnalyze() {
 
@@ -551,15 +576,24 @@ useEffect(() => {
     }
   }
 
-  loadAnalysis();
-
-}, [searchParams]);
+}, []);
 
 return (
 
   <Suspense fallback={null}>
 
     <DashboardShell>
+      <Suspense fallback={null}>
+
+  <SearchParamsHandler
+    onLoad={(id) => {
+      if (id) {
+        loadAnalysis(id);
+      }
+    }}
+  />
+
+</Suspense>
       <div className="grid gap-8 xl:grid-cols-[340px_1fr]">
         <div className="space-y-6">
           <div className="glass-card rounded-[2rem] border border-white/10 p-6 shadow-[0_0_40px_rgba(124,58,237,0.08)]">
