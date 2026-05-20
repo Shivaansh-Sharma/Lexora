@@ -1,32 +1,40 @@
-import { auth }
-from "@/lib/auth/auth";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default auth((req) => {
+export function middleware(
+  request: NextRequest
+) {
 
-  const isLoggedIn =
-    !!req.auth;
+  const token =
+    request.cookies.get(
+      "authjs.session-token"
+    ) ||
+    request.cookies.get(
+      "__Secure-authjs.session-token"
+    );
 
   const isDashboard =
-    req.nextUrl.pathname.startsWith(
+    request.nextUrl.pathname.startsWith(
       "/dashboard"
     );
 
   if (
     isDashboard &&
-    !isLoggedIn
+    !token
   ) {
 
-    return Response.redirect(
+    return NextResponse.redirect(
       new URL(
         "/login",
-        req.nextUrl
+        request.url
       )
     );
   }
-});
+
+  return NextResponse.next();
+}
 
 export const config = {
-
   matcher: [
     "/dashboard/:path*",
   ],
