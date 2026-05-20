@@ -164,14 +164,11 @@ export default function ComparePage() {
       : "bg-gradient-to-r from-emerald-500 to-green-500";
 
   async function handleCompare() {
-
+      const toastId = toast.loading("Comparing texts...");
     try {
 
       setLoading(true);
-const toastId =
-  toast.loading(
-    "Running semantic comparison..."
-  );
+
       const response = await fetch(
         API_URL,
         {
