@@ -84,7 +84,7 @@ export async function POST(
     const results =
       await search(query, {
         safeSearch:
-          SafeSearchType.MODERATE,,
+          SafeSearchType.MODERATE,
       });
 
     const matches =
