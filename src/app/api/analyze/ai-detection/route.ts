@@ -204,11 +204,13 @@ export async function POST(
         0
       );
 
-    const longWords =
-      words.filter(
-        (word) =>
-          word.length >= 8
-      );
+const longWords =
+  words.filter(
+    (
+      word: string
+    ) =>
+      word.length >= 8
+  );
 
     const longWordRatio =
       longWords.length /
