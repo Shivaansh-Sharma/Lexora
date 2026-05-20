@@ -18,6 +18,13 @@ from "@/components/dashboard/dashboard-shell";
 import { useRouter }
 from "next/navigation";
 
+import { toast }
+from "sonner";
+
+import {
+  Skeleton,
+} from "@/components/ui/skeleton";
+
 type Report = {
 
   id: string;
@@ -229,23 +236,45 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      {loading && (
+{loading && (
 
-        <div className="rounded-[2rem] border border-white/10 bg-card/70 p-14 text-center backdrop-blur-xl">
+  <div className="grid gap-6">
 
-          <div className="mx-auto h-14 w-14 animate-spin rounded-full border-4 border-violet-500 border-t-transparent" />
+    {Array.from({
+      length: 5,
+    }).map((_, i) => (
 
-          <h2 className="mt-8 text-3xl font-black tracking-tight">
+      <div
+        key={i}
+        className="rounded-[2rem] border border-white/10 bg-card/70 p-7 backdrop-blur-xl"
+      >
 
-            Loading Reports
-          </h2>
+        <div className="space-y-5">
 
-          <p className="mt-3 text-muted-foreground">
+          <div className="flex gap-3">
 
-            Fetching semantic intelligence history...
-          </p>
+            <Skeleton className="h-8 w-28 rounded-full" />
+
+            <Skeleton className="h-8 w-24 rounded-full" />
+          </div>
+
+          <Skeleton className="h-5 w-full rounded-xl" />
+
+          <Skeleton className="h-5 w-4/5 rounded-xl" />
+
+          <Skeleton className="h-5 w-2/3 rounded-xl" />
+
+          <div className="flex gap-3 pt-4">
+
+            <Skeleton className="h-11 w-24 rounded-2xl" />
+
+            <Skeleton className="h-11 w-24 rounded-2xl" />
+          </div>
         </div>
-      )}
+      </div>
+    ))}
+  </div>
+)}
 
       {!loading &&
         filteredReports.length ===
@@ -310,6 +339,10 @@ export default function ReportsPage() {
                   <button
                     onClick={() => {
 
+  toast.loading(
+    "Opening report..."
+  );
+
                       if (
                         report.category ===
                         "comparison"
@@ -354,12 +387,20 @@ export default function ReportsPage() {
 
                         await loadReports();
 
+                        toast.success(
+  "Report deleted successfully"
+);
+
                       } catch (error) {
 
-                        console.error(
-                          error
-                        );
-                      }
+  console.error(
+    error
+  );
+
+  toast.error(
+    "Failed to delete report"
+  );
+}
                     }}
                     className="rounded-2xl border border-red-500/20 bg-red-500/10 px-5 py-3 text-sm font-medium text-red-400 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:bg-red-500/20"
                   >

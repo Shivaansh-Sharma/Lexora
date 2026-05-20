@@ -91,10 +91,10 @@ export async function GET() {
             item.createdAt,
 
           preview:
-            item.inputText.slice(
-              0,
-              180
-            ),
+  (
+    item.inputText ||
+    "No preview available"
+  ).slice(0, 180),
 
           data: item,
         })
@@ -116,13 +116,17 @@ export async function GET() {
             item.createdAt,
 
           preview:
-            `${item.text1.slice(
-              0,
-              90
-            )} ... ${item.text2.slice(
-              0,
-              90
-            )}`,
+  `${(
+    item.text1 || ""
+  ).slice(
+    0,
+    90
+  )} ... ${(
+    item.text2 || ""
+  ).slice(
+    0,
+    90
+  )}`,
 
           data: item,
         })

@@ -16,6 +16,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { toast }
+from "sonner";
+
 export default function SignupPage() {
 
   const router =
@@ -61,22 +64,24 @@ export default function SignupPage() {
 
       if (!res.ok) {
 
-        alert(
-          "Signup failed"
-        );
+        toast.error(
+  "Signup failed"
+);
 
         return;
       }
-
+toast.success(
+  "Account created"
+);
       router.push(
         "/login"
       );
 
     } catch {
 
-      alert(
-        "Something went wrong"
-      );
+toast.error(
+  "Something went wrong"
+);
 
     } finally {
 

@@ -1,6 +1,10 @@
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
 
+import {
+  PageTransition,
+} from "@/components/ui/page-transition";
+
 export function DashboardShell({
   children,
 }: {
@@ -11,7 +15,7 @@ export function DashboardShell({
 
     <div className="relative flex min-h-screen overflow-hidden bg-background text-foreground">
 
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0 -z-10 overflow-hidden">
 
         <div className="absolute left-[-10%] top-[-10%] h-[500px] w-[500px] rounded-full bg-violet-600/10 blur-3xl" />
 
@@ -22,16 +26,22 @@ export function DashboardShell({
 
       <Sidebar />
 
-      <div className="relative flex flex-1 flex-col">
+      <div className="relative flex flex-1 flex-col overflow-hidden">
 
         <Topbar />
 
-        <main className="flex-1 p-8 xl:p-10">
+        <main className="flex-1 overflow-y-auto p-6 lg:p-8 xl:p-10">
 
-          <div className="mx-auto w-full max-w-[1700px]">
+          <PageTransition>
 
-            {children}
-          </div>
+            <div className="mx-auto w-full max-w-[1700px]">
+
+              {children}
+
+            </div>
+
+          </PageTransition>
+
         </main>
       </div>
     </div>

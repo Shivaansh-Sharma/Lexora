@@ -47,14 +47,24 @@ const links = [
   },
 ];
 
-export function Sidebar() {
+export function Sidebar({
+  mobile = false,
+}: {
+  mobile?: boolean;
+}) {
 
   const pathname =
     usePathname();
 
   return (
 
-    <aside className="hidden w-80 p-4 lg:flex">
+    <aside
+  className={`${
+    mobile
+      ? "flex w-full"
+      : "hidden lg:flex w-80"
+  } flex-col p-4`}
+>
 
   <div className="flex flex-1 flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-sidebar/80 backdrop-blur-2xl shadow-[0_0_50px_rgba(124,58,237,0.08)]">
       <div className="flex h-20 items-center border-b border-white/10 px-8">

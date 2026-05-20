@@ -1,54 +1,67 @@
 "use client";
 
-import { Search } from "lucide-react";
 
 import { ThemeToggle }
 from "@/components/layout/theme-toggle";
+
+import {
+  Menu,
+} from "lucide-react";
+
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+
+import { Sidebar }
+from "./sidebar";
 
 export function Topbar() {
 
   return (
 
-    <header className="sticky top-0 z-40 border-b border-white/10 bg-background/70 backdrop-blur-2xl">
+    <header className="sticky top-0 z-40 flex h-20 items-center justify-between border-b border-white/10 bg-background/70 px-6 backdrop-blur-2xl">
 
-      <div className="flex h-20 items-center justify-between px-8 xl:px-10">
+  <div className="flex items-center gap-4">
 
-        <div className="flex items-center gap-6">
+    <div className="lg:hidden">
 
-          <div>
+      <Sheet>
 
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-violet-400">
+        <SheetTrigger asChild>
 
-              AI Workspace
-            </p>
+          <button className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl transition-all hover:bg-white/10">
 
-            <h1 className="mt-1 text-2xl font-black tracking-tight">
+            <Menu className="h-5 w-5" />
+          </button>
+        </SheetTrigger>
 
-              Lexora Dashboard
-            </h1>
-          </div>
+        <SheetContent
+          side="left"
+          className="w-[300px] border-white/10 bg-background/95 p-0 backdrop-blur-2xl"
+        >
 
-          
-        </div>
+          <Sidebar mobile />
+        </SheetContent>
+      </Sheet>
+    </div>
 
-        <div className="flex items-center gap-4">
+    <div>
 
-          <div className="hidden md:flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 backdrop-blur-xl">
+      <h1 className="text-lg font-bold tracking-tight">
 
-            <div className="h-3 w-3 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.7)]" />
+        Lexora Dashboard
+      </h1>
 
-            <span className="text-sm font-medium">
+      <p className="text-xs text-muted-foreground">
 
-              Systems Operational
-            </span>
-          </div>
+        AI Intelligence Workspace
+      </p>
+    </div>
+  </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-2 backdrop-blur-xl">
-
-            <ThemeToggle />
-          </div>
-        </div>
-      </div>
-    </header>
+  <ThemeToggle />
+</header>
   );
 }

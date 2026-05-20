@@ -35,6 +35,9 @@ import {
   useSearchParams,
 } from "next/navigation";
 
+import { toast }
+from "sonner";
+
 const API_URL =
   "http://127.0.0.1:8000/compare/";
 
@@ -165,7 +168,10 @@ export default function ComparePage() {
     try {
 
       setLoading(true);
-
+const toastId =
+  toast.loading(
+    "Running semantic comparison..."
+  );
       const response = await fetch(
         API_URL,
         {
@@ -196,11 +202,23 @@ export default function ComparePage() {
 
 await loadHistory();
 
+toast.success(
+  "Comparison completed",
+  {
+    id: toastId,
+  }
+);
+
     } catch (error) {
 
       console.error(error);
 
-      alert("Comparison failed");
+      toast.error(
+  "Comparison failed",
+  {
+    id: toastId,
+  }
+);
 
     } finally {
 

@@ -5,7 +5,8 @@ import "./globals.css";
 
 import { ThemeProvider } from "@/components/providers/theme-provider";
 
-import { Toaster } from "sonner";
+import { Toaster }
+from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Lexora",
@@ -29,10 +30,10 @@ export default function RootLayout({
           {children}
 
           <Toaster
-            position="top-right"
-            richColors
-            theme="system"
-          />
+  richColors
+  closeButton
+  position="top-right"
+/>
 
         </ThemeProvider>
       </body>
