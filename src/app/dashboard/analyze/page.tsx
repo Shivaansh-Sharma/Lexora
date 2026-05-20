@@ -23,6 +23,9 @@ import {
   useSearchParams,
 } from "next/navigation";
 
+import { toast }
+from "sonner";
+
 const modules = [
   {
     key: "sentiment",
@@ -320,7 +323,9 @@ type:
 
     console.error(error);
 
-    alert("Analysis failed");
+    toast.error(
+  "Analysis failed"
+);
 
   } finally {
 

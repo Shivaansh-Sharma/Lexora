@@ -1,45 +1,81 @@
 const HF_TOKEN =
   process.env.HF_TOKEN;
 
+async function sleep(
+  ms: number
+) {
+
+  return new Promise(
+    (resolve) =>
+      setTimeout(
+        resolve,
+        ms
+      )
+  );
+}
+
 export async function queryHF(
   model: string,
   payload: any
 ) {
 
-  const response =
-    await fetch(
-      `https://api-inference.huggingface.co/models/${model}`,
-      {
-        method: "POST",
+  for (
+    let attempt = 0;
+    attempt < 3;
+    attempt++
+  ) {
 
-        headers: {
-          Authorization:
-            `Bearer ${HF_TOKEN}`,
+    const response =
+      await fetch(
+        `https://api-inference.huggingface.co/models/${model}`,
+        {
+          method: "POST",
 
-          "Content-Type":
-            "application/json",
-        },
+          headers: {
+            Authorization:
+              `Bearer ${HF_TOKEN}`,
 
-        body: JSON.stringify(
-          typeof payload ===
-            "string"
+            "Content-Type":
+              "application/json",
+          },
 
-            ? {
-                inputs:
-                  payload,
-              }
+          body: JSON.stringify(
+            typeof payload ===
+              "string"
 
-            : payload
-        ),
-      }
-    );
+              ? {
+                  inputs:
+                    payload,
+                }
 
-  if (!response.ok) {
+              : payload
+          ),
+        }
+      );
+
+    if (
+      response.ok
+    ) {
+
+      return response.json();
+    }
+
+    if (
+      response.status ===
+      503
+    ) {
+
+      await sleep(3000);
+
+      continue;
+    }
 
     throw new Error(
       "HuggingFace request failed"
     );
   }
 
-  return response.json();
+  throw new Error(
+    "Model loading timeout"
+  );
 }

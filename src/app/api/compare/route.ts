@@ -4,6 +4,19 @@ from "next/server";
 const HF_TOKEN =
   process.env.HF_TOKEN;
 
+async function sleep(
+  ms: number
+) {
+
+  return new Promise(
+    (resolve) =>
+      setTimeout(
+        resolve,
+        ms
+      )
+  );
+}
+
 async function getEmbedding(
   text: string
 ) {
@@ -28,13 +41,76 @@ async function getEmbedding(
       }
     );
 
+  if (!response.ok) {
+
+    throw new Error(
+      "Embedding request failed"
+    );
+  }
+
   return response.json();
+}
+
+async function retryFetch(
+  text: string
+) {
+
+  for (
+    let i = 0;
+    i < 3;
+    i++
+  ) {
+
+    try {
+
+      const result =
+        await getEmbedding(
+          text
+        );
+
+      if (
+        Array.isArray(
+          result
+        )
+      ) {
+
+        return result;
+      }
+
+      if (
+        result.error
+      ) {
+
+        await sleep(3000);
+
+        continue;
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+      await sleep(3000);
+    }
+  }
+
+  throw new Error(
+    "Embedding failed after retries"
+  );
 }
 
 function cosineSimilarity(
   a: number[],
   b: number[]
 ) {
+
+  if (
+    !a.length ||
+    !b.length
+  ) {
+
+    return 0;
+  }
 
   const dot =
     a.reduce(
@@ -61,6 +137,14 @@ function cosineSimilarity(
       )
     );
 
+  if (
+    magA === 0 ||
+    magB === 0
+  ) {
+
+    return 0;
+  }
+
   return dot / (magA * magB);
 }
 
@@ -73,29 +157,73 @@ export async function POST(
     const body =
       await request.json();
 
+    if (
+      !body.text1 ||
+      !body.text2
+    ) {
+
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Both texts are required",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
     const [
       emb1,
       emb2,
     ] = await Promise.all([
-      getEmbedding(
+      retryFetch(
         body.text1
       ),
-      getEmbedding(
+      retryFetch(
         body.text2
       ),
     ]);
 
-    const similarity =
-      cosineSimilarity(
-        emb1[0],
-        emb2[0]
-      );
+const vector1 =
+  Array.isArray(
+    emb1[0]
+  )
+
+    ? emb1[0]
+
+    : emb1;
+
+const vector2 =
+  Array.isArray(
+    emb2[0]
+  )
+
+    ? emb2[0]
+
+    : emb2;
+
+const similarity =
+  cosineSimilarity(
+    vector1,
+    vector2
+  );
 
     return NextResponse.json({
+
+      success: true,
 
       similarity:
         Math.round(
           similarity * 100
+        ),
+
+      rawSimilarity:
+        Number(
+          similarity.toFixed(
+            4
+          )
         ),
     });
 
@@ -105,6 +233,7 @@ export async function POST(
 
     return NextResponse.json(
       {
+        success: false,
         error:
           "Comparison failed",
       },
