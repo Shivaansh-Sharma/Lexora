@@ -23,7 +23,7 @@ export async function analyzeText(
   }
 
   const response = await fetch(
-    `http://127.0.0.1:8000/analyze/${endpoint}`,
+    `/api/analyze/${endpoint}`,
     {
       method: "POST",
       headers: {
