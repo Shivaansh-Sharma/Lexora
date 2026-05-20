@@ -1,9 +1,19 @@
 from transformers import pipeline
 
-language_detector = pipeline(
-    "text-classification",
-    model="papluca/xlm-roberta-base-language-detection"
-)
+language_detector = None
+
+def get_language_detector():
+
+    global language_detector
+
+    if language_detector is None:
+
+        language_detector = pipeline(
+            "text-classification",
+            model="papluca/xlm-roberta-base-language-detection"
+        )
+
+    return language_detector
 
 LANGUAGE_MAP = {
     "af": "Afrikaans",
@@ -63,20 +73,28 @@ LANGUAGE_MAP = {
 }
 
 def detect_language(text: str):
-    result = language_detector(text)
 
-    prediction = result[0]
+    result =
+        get_language_detector()(text)
 
-    code = prediction["label"]
+    prediction =
+        result[0]
+
+    code =
+        prediction["label"]
 
     return {
         "language_code": code,
-        "language": LANGUAGE_MAP.get(
-            code,
-            code.upper()
-        ),
-        "confidence": round(
-            prediction["score"],
-            4
-        )
+
+        "language":
+            LANGUAGE_MAP.get(
+                code,
+                code.upper()
+            ),
+
+        "confidence":
+            round(
+                prediction["score"],
+                4
+            )
     }

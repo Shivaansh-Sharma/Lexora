@@ -1,90 +1,79 @@
-from transformers import pipeline
+import language_tool_python
 import textstat
 import re
-import difflib
 
-grammar_corrector = pipeline(
-    "text2text-generation",
-    model="pszemraj/flan-t5-large-grammar-synthesis"
-)
+tool = None
 
-def analyze_grammar(text: str):
+def get_tool():
 
-    result = grammar_corrector(
-        f"grammar: {text}",
-        max_length=512
-    )
+    global tool
 
-    corrected_text = result[0][
-        "generated_text"
-    ].replace("grammar:", "").strip()
+    if tool is None:
 
-    original_words = text.split()
-    corrected_words = corrected_text.split()
+        tool = language_tool_python.LanguageTool(
+            "en-US"
+        )
 
-    matcher = difflib.SequenceMatcher(
-        None,
-        original_words,
-        corrected_words
-    )
+    return tool
+
+def analyze_grammar(
+    text: str
+):
+
+    matches =
+        get_tool().check(text)
+
+    corrected_text =
+        language_tool_python.utils.correct(
+            text,
+            matches
+        )
 
     issues = []
 
     grammar_count = 0
     spelling_count = 0
 
-    grammar_keywords = [
-        "were",
-        "was",
-        "is",
-        "are",
-        "to",
-        "too",
-        "their",
-        "there",
-        "they're",
-        "respects",
-        "finishes",
-        "left",
-    ]
+    for match in matches[:20]:
 
-    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        issue_type =
+            "grammar"
 
-        if tag != "equal":
+        if (
+            "spelling"
+            in match.ruleIssueType.lower()
+        ):
 
-            original_fragment = " ".join(
-                original_words[i1:i2]
-            )
+            issue_type =
+                "spelling"
 
-            corrected_fragment = " ".join(
-                corrected_words[j1:j2]
-            )
+            spelling_count += 1
 
-            if (
-                original_fragment.lower()
-                in grammar_keywords
-                or len(original_fragment.split()) > 1
-            ):
+        else:
 
-                issue_type = "grammar"
-                grammar_count += 1
+            grammar_count += 1
 
-            else:
+        issues.append({
 
-                issue_type = "spelling"
-                spelling_count += 1
+            "type":
+                issue_type,
 
-            issues.append({
-                "type": issue_type,
+            "original":
+                text[
+                    match.offset:
+                    match.offset + match.errorLength
+                ],
 
-                "original":
-                    original_fragment,
+            "suggestion":
+                match.replacements[0]
+                if match.replacements
+                else ""
+        })
 
-                "suggestion":
-                    corrected_fragment
-            })
-
-    sentences = re.split(r"[.!?]+", text)
+    sentences = re.split(
+        r"[.!?]+",
+        text
+    )
 
     sentences = [
         s.strip()
@@ -92,13 +81,17 @@ def analyze_grammar(text: str):
         if s.strip()
     ]
 
-    word_count = len(original_words)
+    word_count =
+        len(text.split())
 
     average_sentence_length = (
+
         round(
-            word_count / len(sentences),
+            word_count /
+            len(sentences),
             2
         )
+
         if sentences
         else 0
     )
@@ -124,23 +117,32 @@ def analyze_grammar(text: str):
     )
 
     if reading_ease >= 80:
-        writing_level = "Easy"
+
+        writing_level =
+            "Easy"
 
     elif reading_ease >= 60:
-        writing_level = "Intermediate"
+
+        writing_level =
+            "Intermediate"
 
     else:
-        writing_level = "Advanced"
+
+        writing_level =
+            "Advanced"
 
     tone = "Neutral"
 
     if average_sentence_length > 20:
+
         tone = "Formal"
 
     elif average_sentence_length < 10:
+
         tone = "Casual"
 
     return {
+
         "corrected_text":
             corrected_text,
 
@@ -154,7 +156,7 @@ def analyze_grammar(text: str):
             spelling_count,
 
         "issues":
-            issues[:20],
+            issues,
 
         "average_sentence_length":
             average_sentence_length,

@@ -1,14 +1,28 @@
 from transformers import pipeline
 
-classifier = pipeline(
-    "sentiment-analysis",
-    model="distilbert/distilbert-base-uncased-finetuned-sst-2-english"
-)
+classifier = None
+
+def get_classifier():
+
+    global classifier
+
+    if classifier is None:
+
+        classifier = pipeline(
+            "sentiment-analysis",
+            model="distilbert/distilbert-base-uncased-finetuned-sst-2-english"
+        )
+
+    return classifier
 
 def analyze_sentiment(text: str):
-    result = classifier(text)[0]
+
+    result = get_classifier()(text)[0]
 
     return {
         "label": result["label"],
-        "score": round(result["score"], 4)
+        "score": round(
+            result["score"],
+            4
+        )
     }

@@ -1,12 +1,33 @@
 from keybert import KeyBERT
 from transformers import pipeline
 
-kw_model = KeyBERT()
+kw_model = None
+classifier = None
 
-classifier = pipeline(
-    "zero-shot-classification",
-    model="facebook/bart-large-mnli"
-)
+def get_kw_model():
+
+    global kw_model
+
+    if kw_model is None:
+
+        kw_model = KeyBERT()
+
+    return kw_model
+
+
+def get_classifier():
+
+    global classifier
+
+    if classifier is None:
+
+        classifier = pipeline(
+            "zero-shot-classification",
+            model="typeform/distilbert-base-uncased-mnli"
+        )
+
+    return classifier
+
 
 CANDIDATE_LABELS = [
     "Technology",
@@ -74,8 +95,10 @@ CANDIDATE_LABELS = [
     "Motivation",
 ]
 
+
 def extract_topics(text: str):
-    keywords = kw_model.extract_keywords(
+
+    keywords = get_kw_model().extract_keywords(
         text,
         keyphrase_ngram_range=(1, 3),
         stop_words="english",
@@ -89,9 +112,11 @@ def extract_topics(text: str):
     seen = set()
 
     for keyword, score in keywords:
+
         normalized = keyword.lower().strip()
 
         if normalized not in seen:
+
             seen.add(normalized)
 
             cleaned_topics.append({
@@ -99,7 +124,7 @@ def extract_topics(text: str):
                 "score": round(score, 4)
             })
 
-    classification = classifier(
+    classification = get_classifier()(
         text,
         CANDIDATE_LABELS,
         multi_label=True
@@ -111,13 +136,16 @@ def extract_topics(text: str):
         classification["labels"],
         classification["scores"]
     ):
+
         if score > 0.15:
+
             categories.append({
                 "category": label,
                 "score": round(score, 4)
             })
 
     return {
+
         "main_category":
             categories[0]["category"]
             if categories

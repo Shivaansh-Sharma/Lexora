@@ -2,10 +2,11 @@ fastapi
 uvicorn[standard]
 
 transformers==4.41.2
-torch
-sentence-transformers
+torch==2.3.1
+sentence-transformers==2.7.0
+
 scikit-learn
-spacy
+spacy==3.7.5
 nltk
 keybert
 textstat
@@ -16,12 +17,8 @@ yake
 rake-nltk
 
 numpy
-pandas
-scipy
 
-beautifulsoup4
 requests
-lxml
 
 python-multipart
 pydantic
@@ -31,9 +28,6 @@ sentencepiece
 
 deep-translator
 langdetect
-
-matplotlib
-wordcloud
 
 python-dotenv
 
