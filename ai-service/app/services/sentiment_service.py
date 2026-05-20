@@ -1,4 +1,8 @@
+import torch
+
 from transformers import pipeline
+
+torch.set_num_threads(1)
 
 classifier = None
 
@@ -10,7 +14,8 @@ def get_classifier():
 
         classifier = pipeline(
             "sentiment-analysis",
-            model="distilbert/distilbert-base-uncased-finetuned-sst-2-english"
+            model="distilbert/distilbert-base-uncased-finetuned-sst-2-english",
+            device=-1
         )
 
     return classifier
