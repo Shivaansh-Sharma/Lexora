@@ -3,9 +3,9 @@
 import { motion }
 from "framer-motion";
 
-import {
-  ButtonHTMLAttributes,
+import type {
   ReactNode,
+  ButtonHTMLAttributes,
 } from "react";
 
 type MotionButtonProps =
@@ -39,7 +39,7 @@ export function MotionButton({
 
       className={className}
 
-      {...props}
+      {...(props as any)}
     >
 
       {children}
