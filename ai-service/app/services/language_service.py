@@ -74,14 +74,11 @@ LANGUAGE_MAP = {
 
 def detect_language(text: str):
 
-    result =
-        get_language_detector()(text)
+    result = get_language_detector()(text)
 
-    prediction =
-        result[0]
+    prediction = result[0]
 
-    code =
-        prediction["label"]
+    code = prediction["label"]
 
     return {
         "language_code": code,

@@ -20,11 +20,9 @@ def analyze_grammar(
     text: str
 ):
 
-    matches =
-        get_tool().check(text)
+    matches = get_tool().check(text)
 
-    corrected_text =
-        language_tool_python.utils.correct(
+    corrected_text = language_tool_python.utils.correct(
             text,
             matches
         )
@@ -36,16 +34,14 @@ def analyze_grammar(
 
     for match in matches[:20]:
 
-        issue_type =
-            "grammar"
+        issue_type = "grammar"
 
         if (
             "spelling"
             in match.ruleIssueType.lower()
         ):
 
-            issue_type =
-                "spelling"
+            issue_type = "spelling"
 
             spelling_count += 1
 
@@ -81,8 +77,7 @@ def analyze_grammar(
         if s.strip()
     ]
 
-    word_count =
-        len(text.split())
+    word_count = len(text.split())
 
     average_sentence_length = (
 
@@ -118,18 +113,15 @@ def analyze_grammar(
 
     if reading_ease >= 80:
 
-        writing_level =
-            "Easy"
+        writing_level = "Easy"
 
     elif reading_ease >= 60:
 
-        writing_level =
-            "Intermediate"
+        writing_level = "Intermediate"
 
     else:
 
-        writing_level =
-            "Advanced"
+        writing_level = "Advanced"
 
     tone = "Neutral"
 
