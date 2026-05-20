@@ -5,6 +5,10 @@ import {
   search,
 } from "duck-duck-scrape";
 
+import {
+  SafeSearchType,
+} from "duck-duck-scrape";
+
 function similarity(
   a: string,
   b: string
@@ -79,7 +83,8 @@ export async function POST(
 
     const results =
       await search(query, {
-        safeSearch:1,
+        safeSearch:
+          SafeSearchType.MODERATE,,
       });
 
     const matches =
