@@ -1583,6 +1583,5 @@ onClick={() => {
       </div>
     </DashboardShell>
       </Suspense>
-</Suspense>
   );
 }
