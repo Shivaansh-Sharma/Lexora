@@ -17,16 +17,16 @@ def get_summarizer():
 
 def summarize_text(text: str):
 
-    cleaned_text =
-        " ".join(text.split())
+    cleaned_text = " ".join(
+        text.split()
+    )
 
-    result =
-        get_summarizer()(
-            cleaned_text,
-            max_length=120,
-            min_length=30,
-            do_sample=False
-        )
+    result = get_summarizer()(
+        cleaned_text,
+        max_length=120,
+        min_length=30,
+        do_sample=False
+    )
 
     return {
         "summary":
