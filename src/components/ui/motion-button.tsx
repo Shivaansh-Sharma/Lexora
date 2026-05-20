@@ -1,26 +1,23 @@
 "use client";
 
-import {
-  motion,
-} from "framer-motion";
+import { motion }
+from "framer-motion";
 
 import {
   ButtonHTMLAttributes,
   ReactNode,
 } from "react";
 
-type Props =
+type MotionButtonProps =
   ButtonHTMLAttributes<HTMLButtonElement> & {
     children: ReactNode;
-
-    className?: string;
   };
 
 export function MotionButton({
   children,
   className,
   ...props
-}: Props) {
+}: MotionButtonProps) {
 
   return (
 
@@ -36,17 +33,17 @@ export function MotionButton({
 
       transition={{
         type: "spring",
-
-        stiffness: 320,
-
-        damping: 18,
+        stiffness: 300,
+        damping: 20,
       }}
 
       className={className}
 
       {...props}
     >
+
       {children}
+
     </motion.button>
   );
 }
