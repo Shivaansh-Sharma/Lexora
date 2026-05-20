@@ -1,8 +1,9 @@
 import { NextResponse }
 from "next/server";
 
-import textstat
-from "textstat";
+import {
+  fleschReadingEase,
+} from "text-readability";
 
 export async function POST(
   request: Request
@@ -11,19 +12,12 @@ export async function POST(
   const body =
     await request.json();
 
-  const text =
-    body.text;
-
   return NextResponse.json({
+    success: true,
 
-    fleschReadingEase:
-      textstat.fleschReadingEase(
-        text
-      ),
-
-    grade:
-      textstat.fleschKincaidGrade(
-        text
+    score:
+      fleschReadingEase(
+        body.text
       ),
   });
 }
