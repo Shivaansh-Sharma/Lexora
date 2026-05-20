@@ -4,6 +4,7 @@ import {
   useEffect,
   useRef,
   useState,
+  Suspense,
 } from "react";
 
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
@@ -554,7 +555,10 @@ useEffect(() => {
 
 }, [searchParams]);
 
-  return (
+return (
+
+  <Suspense fallback={null}>
+
     <DashboardShell>
       <div className="grid gap-8 xl:grid-cols-[340px_1fr]">
         <div className="space-y-6">
@@ -1578,5 +1582,7 @@ onClick={() => {
         </div>
       </div>
     </DashboardShell>
+      </Suspense>
+</Suspense>
   );
 }
