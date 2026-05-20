@@ -189,7 +189,7 @@ toast.error(
               <input
                 type="email"
                 placeholder="Email address"
-                className="w-full rounded-2xl border border-white/10 bg-black/10 px-5 py-4 text-base outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
+                className="w-full rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-black/10 px-5 py-4 text-base outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
                 value={email}
                 onChange={(e) =>
                   setEmail(
@@ -201,7 +201,7 @@ toast.error(
               <input
                 type="password"
                 placeholder="Password"
-                className="w-full rounded-2xl border border-white/10 bg-black/10 px-5 py-4 text-base outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
+                className="w-full rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-black/10 px-5 py-4 text-base outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
                 value={password}
                 onChange={(e) =>
                   setPassword(

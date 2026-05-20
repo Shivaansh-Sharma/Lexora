@@ -516,7 +516,7 @@ useEffect(() => {
                 setText1(e.target.value)
               }
               placeholder="Paste first document..."
-              className="mt-6 min-h-[380px] w-full rounded-[2rem] border border-white/10 bg-black/10 p-6 text-base leading-8 outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
+              className="mt-8 min-h-[340px] w-full rounded-[2rem] border border-black/5 bg-white/70 p-6 text-base leading-8 shadow-sm backdrop-blur-xl outline-none transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 dark:border-white/10 dark:bg-black/10"
             />
           </div>
 
@@ -531,7 +531,7 @@ useEffect(() => {
                 setText2(e.target.value)
               }
               placeholder="Paste second document..."
-              className="mt-6 min-h-[380px] w-full rounded-[2rem] border border-white/10 bg-black/10 p-6 text-base leading-8 outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
+              className="mt-8 min-h-[340px] w-full rounded-[2rem] border border-black/5 bg-white/70 p-6 text-base leading-8 shadow-sm backdrop-blur-xl outline-none transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 dark:border-white/10 dark:bg-black/10"
             />
           </div>
         </div>
@@ -752,7 +752,7 @@ useEffect(() => {
 
                       <div className="mt-6 grid gap-4 lg:grid-cols-2">
 
-                        <div className="rounded-2xl border border-white/10 bg-black/10 p-6 backdrop-blur-xl">
+                        <div className="rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-black/10 p-6 backdrop-blur-xl">
 
                           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Text 1 Match
@@ -763,7 +763,7 @@ useEffect(() => {
                           </p>
                         </div>
 
-                        <div className="rounded-2xl border border-white/10 bg-black/10 p-6 backdrop-blur-xl">
+                        <div className="rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-black/10 p-6 backdrop-blur-xl">
 
                           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                             Text 2 Match
@@ -928,7 +928,7 @@ fill="#e4e4e7"
 
                 <div className="grid gap-4 lg:grid-cols-2">
 
-                  <div className="rounded-2xl border border-white/10 bg-black/10 p-5 backdrop-blur-xl">
+                  <div className="rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-black/10 p-5 backdrop-blur-xl">
 
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       Text 1
@@ -940,7 +940,7 @@ fill="#e4e4e7"
                     </p>
                   </div>
 
-                  <div className="rounded-2xl border border-white/10 bg-black/10 p-5 backdrop-blur-xl">
+                  <div className="rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-black/10 p-5 backdrop-blur-xl">
 
                     <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       Text 2

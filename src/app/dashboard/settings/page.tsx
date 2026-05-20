@@ -216,7 +216,7 @@ async function handleNameUpdate(
                     )
                   }
                   placeholder="Enter your name"
-                  className="h-14 w-full rounded-2xl border border-white/10 bg-black/10 px-5 outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
+                  className="h-14 w-full rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-black/10 px-5 outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
                 />
               </div>
 
@@ -278,7 +278,7 @@ async function handleNameUpdate(
                     )
                   }
                   placeholder="Current password"
-                  className="h-14 w-full rounded-2xl border border-white/10 bg-black/10 px-5 outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
+                  className="h-14 w-full rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-black/10 px-5 outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
                 />
               </div>
 
@@ -298,7 +298,7 @@ async function handleNameUpdate(
                     )
                   }
                   placeholder="New password"
-                  className="h-14 w-full rounded-2xl border border-white/10 bg-black/10 px-5 outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
+                  className="h-14 w-full rounded-2xl border border-black/5 dark:border-white/10 bg-white/70 dark:bg-black/10 px-5 outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
                 />
               </div>
 

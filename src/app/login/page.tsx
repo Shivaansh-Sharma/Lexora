@@ -1,4 +1,14 @@
+"use client";
+
 import Link from "next/link";
+
+import {
+  useState,
+} from "react";
+
+import {
+  useRouter,
+} from "next/navigation";
 
 import {
   ArrowRight,
@@ -6,10 +16,82 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { loginAction }
-from "@/actions/auth";
+import { signIn }
+from "next-auth/react";
+
+import { toast }
+from "sonner";
 
 export default function LoginPage() {
+
+  const router =
+    useRouter();
+
+  const [email, setEmail] =
+    useState("");
+
+  const [
+    password,
+    setPassword,
+  ] = useState("");
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  async function handleLogin(
+    e: React.FormEvent
+  ) {
+
+    e.preventDefault();
+
+    try {
+
+      setLoading(true);
+
+      const result =
+        await signIn(
+          "credentials",
+          {
+            email,
+            password,
+            redirect: false,
+          }
+        );
+
+      if (
+        result?.error
+      ) {
+
+        toast.error(
+          "Invalid email or password"
+        );
+
+        return;
+      }
+
+      toast.success(
+        "Login successful"
+      );
+
+      router.push(
+        "/dashboard"
+      );
+
+      router.refresh();
+
+    } catch {
+
+      toast.error(
+        "Something went wrong"
+      );
+
+    } finally {
+
+      setLoading(false);
+    }
+  }
 
   return (
 
@@ -102,32 +184,50 @@ export default function LoginPage() {
             </div>
 
             <form
-              action={loginAction}
+              onSubmit={
+                handleLogin
+              }
               className="space-y-5"
             >
 
               <input
                 type="email"
-                name="email"
                 placeholder="Email address"
-                className="w-full rounded-2xl border border-white/10 bg-black/10 px-5 py-4 text-base outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
+                value={email}
+                onChange={(e) =>
+                  setEmail(
+                    e.target.value
+                  )
+                }
+                className="w-full rounded-2xl border border-black/5 bg-white/70 px-5 py-4 text-base outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 dark:border-white/10 dark:bg-black/10"
               />
 
               <input
                 type="password"
-                name="password"
                 placeholder="Password"
-                className="w-full rounded-2xl border border-white/10 bg-black/10 px-5 py-4 text-base outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
+                value={password}
+                onChange={(e) =>
+                  setPassword(
+                    e.target.value
+                  )
+                }
+                className="w-full rounded-2xl border border-black/5 bg-white/70 px-5 py-4 text-base outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 dark:border-white/10 dark:bg-black/10"
               />
 
               <button
                 type="submit"
-                className="group flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 py-4 text-base font-medium text-white shadow-[0_0_40px_rgba(124,58,237,0.25)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_60px_rgba(124,58,237,0.35)]"
+                disabled={loading}
+                className="group flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 py-4 text-base font-medium text-white shadow-[0_0_40px_rgba(124,58,237,0.25)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_60px_rgba(124,58,237,0.35)] disabled:cursor-not-allowed disabled:opacity-60"
               >
 
-                Login
+                {loading
+                  ? "Signing in..."
+                  : "Login"}
 
-                <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                {!loading && (
+
+                  <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                )}
               </button>
             </form>
 

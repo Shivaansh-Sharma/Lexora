@@ -642,7 +642,7 @@ onClick={() => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Paste your text here..."
-            className="mt-8 min-h-[340px] w-full rounded-[2rem] border border-white/10 bg-black/10 p-6 text-base leading-8 outline-none backdrop-blur-xl transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20"
+            className="mt-8 min-h-[340px] w-full rounded-[2rem] border border-black/5 bg-white/70 p-6 text-base leading-8 shadow-sm backdrop-blur-xl outline-none transition-all duration-200 placeholder:text-muted-foreground/60 focus:border-violet-500/50 focus:ring-2 focus:ring-violet-500/20 dark:border-white/10 dark:bg-black/10"
           />
 
           <button

@@ -339,9 +339,9 @@ export default function ReportsPage() {
                   <button
                     onClick={() => {
 
-  toast.loading(
-    "Opening report..."
-  );
+toast.success(
+  "Report opened"
+);
 
                       if (
                         report.category ===
