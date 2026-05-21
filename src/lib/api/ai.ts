@@ -148,16 +148,16 @@ case "language":
 
     break;
 
-  case "ner":
+case "ner":
 
-    normalized = {
-      entities:
-        data?.result?.entities ||
-        data?.entities ||
-        [],
-    };
+  normalized =
+    Array.isArray(
+      data?.result
+    )
+      ? data.result
+      : [];
 
-    break;
+  break;
 
   case "keywords":
 
