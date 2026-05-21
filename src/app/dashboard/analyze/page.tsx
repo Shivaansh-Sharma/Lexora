@@ -162,14 +162,7 @@ type TopicResult = {
 };
 
 type AIDetectionResult = {
-  ai_writing_likelihood: number;
-
-  human_writing_likelihood: number;
-
-  prediction: string;
-
-  confidence: number;
-
+metrics: {
   sentence_count: number;
 
   word_count: number;
@@ -192,21 +185,8 @@ type AIDetectionResult = {
 
   long_word_ratio: number;
 
-  perplexity_indicator: string;
-
-  analysis_breakdown: {
-    structure_score: number;
-
-    vocabulary_score: number;
-
-    readability_score: number;
-
-    uniformity_score: number;
-
-    pattern_score: number;
-  };
-
-  disclaimer: string;
+  perplexity_indicator: number;
+};
 };
 
 type MatchedSource = {
@@ -874,7 +854,7 @@ onClick={() => {
                     </p>
 
                     <h4 className="mt-3 text-3xl font-bold">
-                      {result.flesch_reading_ease}
+                      {result.metrics?.reading_ease || 0}
                     </h4>
                   </div>
 
@@ -884,7 +864,7 @@ onClick={() => {
                     </p>
 
                     <h4 className="mt-3 text-3xl font-bold">
-                      {result.flesch_kincaid_grade}
+                      {result.metrics?.grade_level || 0}
                     </h4>
                   </div>
 
@@ -904,7 +884,7 @@ onClick={() => {
                     </p>
 
                     <h4 className="mt-3 text-3xl font-bold">
-                      {result.sentence_count || result.sentenceCount}
+                      {result.metrics?.sentence_count || 0}
                     </h4>
                   </div>
 
@@ -1146,7 +1126,7 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-            {result.sentence_count || result.sentenceCount}
+            {result.metrics?.sentence_count || 0}
           </h4>
         </div>
 
@@ -1224,7 +1204,7 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-lg font-bold">
-            {(result.perplexity_indicator || result.perplexityIndicator)}
+            {result.metrics?.perplexity_indicator || 0}%
           </h4>
         </div>
       </div>
