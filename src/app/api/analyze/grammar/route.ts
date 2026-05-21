@@ -10,7 +10,9 @@ export async function POST(
     const text =
       body.text || "";
 
-    const matches = [];
+const matches: {
+  message: string;
+}[] = [];
 
     if (
       text.includes("  ")
