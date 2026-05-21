@@ -114,16 +114,28 @@ switch (type) {
 
     break;
 
-  case "language":
+case "language":
 
-    normalized = {
-      language:
-        data?.result?.language ||
-        data?.language ||
-        "Unknown",
-    };
+  normalized = {
+    language:
+      data?.result?.language ||
+      "Unknown",
 
-    break;
+    code:
+      data?.result?.code ||
+      "unknown",
+
+    confidence:
+      Number(
+        (
+          (data?.result
+            ?.confidence || 0) *
+          100
+        ).toFixed(2)
+      ),
+  };
+
+  break;
 
   case "summarize":
 
