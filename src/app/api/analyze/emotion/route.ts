@@ -1,12 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextResponse }
+from "next/server";
 
 const emotions = {
+
   joy: [
     "happy",
     "joy",
     "love",
     "excited",
     "great",
+    "amazing",
+    "wonderful",
+    "fantastic",
+    "excellent",
+    "delighted",
   ],
 
   sadness: [
@@ -14,6 +21,8 @@ const emotions = {
     "cry",
     "depressed",
     "lonely",
+    "hurt",
+    "miserable",
   ],
 
   anger: [
@@ -21,6 +30,8 @@ const emotions = {
     "hate",
     "furious",
     "annoyed",
+    "frustrated",
+    "rage",
   ],
 
   fear: [
@@ -28,53 +39,115 @@ const emotions = {
     "afraid",
     "worried",
     "anxious",
+    "panic",
+    "nervous",
+  ],
+
+  optimism: [
+    "hope",
+    "optimistic",
+    "positive",
+    "confident",
+    "successful",
+    "bright",
+  ],
+
+  surprise: [
+    "surprised",
+    "shocked",
+    "unexpected",
+    "astonished",
   ],
 };
 
 export async function POST(
   request: Request
 ) {
+
   try {
+
     const body =
       await request.json();
 
     const text =
-      body.text.toLowerCase();
+      (
+        body.text || ""
+      ).toLowerCase();
 
-    const scores:
-      Record<string, number> =
-      {};
+    const words =
+      text.match(/\b\w+\b/g)
+      || [];
+
+    const totalWords =
+      Math.max(
+        words.length,
+        1
+      );
+
+    const result: {
+      label: string;
+      score: number;
+    }[] = [];
 
     for (const key in emotions) {
-      scores[key] = 0;
+
+      let count = 0;
 
       emotions[
         key as keyof typeof emotions
-      ].forEach((word) => {
-        if (text.includes(word)) {
-          scores[key]++;
+      ].forEach(
+        (word) => {
+
+          const matches =
+            text.match(
+              new RegExp(
+                `\\b${word}\\b`,
+                "gi"
+              )
+            );
+
+          if (matches) {
+            count +=
+              matches.length;
+          }
         }
-      });
+      );
+
+      if (count > 0) {
+
+        result.push({
+
+          label: key,
+
+          score:
+            Number(
+              Math.min(
+                count /
+                  (
+                    totalWords *
+                    0.08
+                  ),
+                1
+              ).toFixed(2)
+            ),
+        });
+      }
     }
 
-    const topEmotion =
-      Object.entries(scores).sort(
-        (a, b) => b[1] - a[1]
-      )[0];
+    result.sort(
+      (a, b) =>
+        b.score - a.score
+    );
 
     return NextResponse.json({
+
       success: true,
 
-      emotion: topEmotion[0],
-
-      confidence:
-        topEmotion[1] > 0
-          ? 0.8
-          : 0.4,
-
-      scores,
+      result,
     });
+
   } catch {
+
     return NextResponse.json(
       {
         success: false,
