@@ -1,14 +1,21 @@
 import { NextResponse }
 from "next/server";
 
-function countSyllables(word: string) {
+function countSyllables(
+  word: string
+) {
 
-  word = word.toLowerCase();
+  word =
+    word.toLowerCase();
 
-  if (word.length <= 3) return 1;
+  if (
+    word.length <= 3
+  ) return 1;
 
   const matches =
-    word.match(/[aeiouy]{1,2}/g);
+    word.match(
+      /[aeiouy]{1,2}/g
+    );
 
   return matches
     ? matches.length
@@ -28,16 +35,21 @@ export async function POST(
       body.text || "";
 
     const sentences =
-      text.split(/[.!?]+/)
-      .filter(Boolean);
+      text
+        .split(/[.!?]+/)
+        .filter(Boolean);
 
     const words =
-      text.match(/\b\w+\b/g)
-      || [];
+      text.match(
+        /\b\w+\b/g
+      ) || [];
 
     const syllables =
       words.reduce(
-        (total, word) =>
+        (
+          total,
+          word
+        ) =>
           total +
           countSyllables(word),
         0
@@ -55,14 +67,20 @@ export async function POST(
         1
       );
 
+    const difficultWords =
+      words.filter(
+        (word) =>
+          countSyllables(word) >= 3
+      ).length;
+
     const readingEase =
       206.835 -
       1.015 *
-      (wordCount /
-        sentenceCount) -
+        (wordCount /
+          sentenceCount) -
       84.6 *
-      (syllables /
-        wordCount);
+        (syllables /
+          wordCount);
 
     const gradeLevel =
       0.39 *
@@ -74,17 +92,28 @@ export async function POST(
       15.59;
 
     return NextResponse.json({
+
       success: true,
 
       readingEase:
         Number(
-          readingEase.toFixed(2)
+          readingEase.toFixed(
+            2
+          )
         ),
 
       gradeLevel:
         Number(
-          gradeLevel.toFixed(2)
+          gradeLevel.toFixed(
+            2
+          )
         ),
+
+      sentenceCount,
+
+      wordCount,
+
+      difficultWords,
     });
 
   } catch (error) {
