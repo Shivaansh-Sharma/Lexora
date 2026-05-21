@@ -1212,9 +1212,9 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-            {({Number(
+{Number(
   result.metrics?.long_word_ratio || 0
-).toFixed(2)}%)}%
+).toFixed(2)}%
           </h4>
         </div>
 
