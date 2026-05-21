@@ -23,7 +23,7 @@ async function getEmbedding(
 
   const response =
     await fetch(
-      "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2",
+      "https://router.huggingface.co/hf-inference/models/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2",
       {
         method: "POST",
 
