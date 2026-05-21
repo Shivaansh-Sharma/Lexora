@@ -1,6 +1,6 @@
 export async function analyzeEmotion(text: string) {
   const response = await fetch(
-    "http://127.0.0.1:8000/analyze/emotion",
+    "/api/analyze/emotion",
     {
       method: "POST",
       headers: {
