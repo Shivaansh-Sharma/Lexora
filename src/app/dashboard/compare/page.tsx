@@ -165,13 +165,19 @@ function ComparePageContent() {
       ? "bg-gradient-to-r from-yellow-500 to-amber-500"
       : "bg-gradient-to-r from-emerald-500 to-green-500";
 
-  async function handleCompare() {
-      const toastId = toast.loading("Comparing texts...");
-    try {
+async function handleCompare() {
 
-      setLoading(true);
+  const toastId =
+    toast.loading(
+      "Comparing texts..."
+    );
 
-      const response = await fetch(
+  try {
+
+    setLoading(true);
+
+    const response =
+      await fetch(
         API_URL,
         {
           method: "POST",
@@ -188,72 +194,55 @@ function ComparePageContent() {
         }
       );
 
-      const data =
-        await response.json();
+    const data =
+      await response.json();
 
-      setResult({
-  similarity_score:
-    data.similarity,
+    if (!response.ok) {
 
-  tone_difference:
-    "Moderate",
-
-  keyword_overlap: [],
-
-  keyword_overlap_score:
-    data.similarity,
-
-  plagiarism_risk:
-    data.similarity > 80
-      ? "High"
-      : data.similarity > 50
-      ? "Moderate"
-      : "Low",
-
-  matching_sentences: [],
-
-  text1_sentiment: {
-    label: "NEUTRAL",
-    score: 0.5,
-  },
-
-  text2_sentiment: {
-    label: "NEUTRAL",
-    score: 0.5,
-  },
-});
-
-      await saveComparison({
-  text1,
-  text2,
-  result: data.data,
-});
-
-await loadHistory();
-
-toast.success(
-  "Comparison completed",
-  {
-    id: toastId,
-  }
-);
-
-    } catch (error) {
-
-      console.error(error);
-
-      toast.error(
-  "Comparison failed",
-  {
-    id: toastId,
-  }
-);
-
-    } finally {
-
-      setLoading(false);
+      throw new Error(
+        data.error ||
+        "Comparison failed"
+      );
     }
+
+    setResult(
+      data.data
+    );
+
+    await saveComparison({
+
+      text1,
+
+      text2,
+
+      result: data.data,
+    });
+
+    await loadHistory();
+
+    toast.success(
+      "Comparison completed",
+      {
+        id: toastId,
+      }
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    toast.error(
+      "Comparison failed",
+      {
+        id: toastId,
+      }
+    );
+
+  } finally {
+
+    setLoading(false);
   }
+}
 
   async function handleDownloadPDF() {
 
