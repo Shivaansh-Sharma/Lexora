@@ -719,8 +719,7 @@ onClick={() => {
               </div>
             )}
 {selectedModule === "emotion" &&
-  result &&
-  result.scores && (
+  Array.isArray(result) && (
 
     <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl">
 
@@ -730,26 +729,36 @@ onClick={() => {
 
       <div className="mt-8 space-y-6">
 
-        {Object.entries(
-          result.scores
-        ).map(
-          ([emotion, score]) => (
+        {result.length === 0 && (
+
+          <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-5 text-yellow-200">
+            No emotions detected.
+          </div>
+        )}
+
+        {result.map(
+          (
+            emotion: any,
+            index: number
+          ) => (
 
             <div
-              key={emotion}
+              key={`${emotion.label}-${index}`}
               className="space-y-2"
             >
 
               <div className="flex items-center justify-between">
 
                 <p className="font-medium capitalize">
-                  {emotion}
+                  {emotion.label}
                 </p>
 
                 <p className="text-sm text-muted-foreground">
 
                   {(
-                    Number(score) * 100
+                    Number(
+                      emotion.score
+                    ) * 100
                   ).toFixed(0)}
                   %
 
@@ -762,7 +771,9 @@ onClick={() => {
                   className="h-full rounded-full bg-primary"
                   style={{
                     width: `${
-                      Number(score) * 100
+                      Number(
+                        emotion.score
+                      ) * 100
                     }%`,
                   }}
                 />
