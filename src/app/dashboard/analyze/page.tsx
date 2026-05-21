@@ -1022,25 +1022,26 @@ onClick={() => {
     </div>
 )}
 
-  {selectedModule === "grammar" &&
-  result &&
-  result.analysis && (
+ {selectedModule === "grammar" &&
+ result?.matches && (
 
-    <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl">
+  <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl">
 
-      <h3 className="text-2xl font-bold">
-        Grammar Suggestions
-      </h3>
+    <h3 className="text-2xl font-bold">
+      Grammar Suggestions
+    </h3>
 
-      <div className="mt-8 space-y-4">
+    <div className="mt-8 space-y-4">
 
-        {result.analysis.matches.length === 0 && (
-          <div className="rounded-2xl border border-green-500/20 bg-green-500/10 p-5 text-green-300">
-            No grammar issues detected.
-          </div>
-        )}
+      {result.matches.length === 0 ? (
 
-        {result.analysis.matches.map(
+        <div className="rounded-2xl border border-green-500/20 bg-green-500/10 p-5 text-green-300">
+          No grammar issues detected.
+        </div>
+
+      ) : (
+
+        result.matches.map(
           (
             match: any,
             index: number
@@ -1053,9 +1054,11 @@ onClick={() => {
               {match.message}
             </div>
           )
-        )}
-      </div>
+        )
+
+      )}
     </div>
+  </div>
 )}
 
             {selectedModule === "ai-detection" &&
