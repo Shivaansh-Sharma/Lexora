@@ -182,20 +182,19 @@ case "grammar":
 
   case "readability":
 
-    normalized = {
-      readingEase:
-        data?.result?.readingEase ||
-        data?.readingEase ||
-        0,
+  normalized = {
+    reading_ease:
+      data?.result?.readingEase ||
+      data?.readingEase ||
+      0,
 
-      gradeLevel:
-        data?.result?.gradeLevel ||
-        data?.gradeLevel ||
-        0,
-    };
+    grade_level:
+      data?.result?.gradeLevel ||
+      data?.gradeLevel ||
+      0,
+  };
 
-    break;
-
+  break;
 case "topic":
 
   normalized = {
