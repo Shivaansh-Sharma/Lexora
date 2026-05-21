@@ -1146,7 +1146,7 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-            {result.reading_ease || result.readingEase}
+            {result.metrics?.reading_ease || 0}
           </h4>
         </div>
 
@@ -1156,7 +1156,7 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-            {result.gradeLevel || result.gradeLevel}
+            {result.metrics?.grade_level || 0}
           </h4>
         </div>
       </div>
