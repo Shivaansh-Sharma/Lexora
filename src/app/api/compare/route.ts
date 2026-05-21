@@ -1,6 +1,44 @@
 import { NextResponse }
 from "next/server";
 
+const STOP_WORDS = [
+  "the",
+  "and",
+  "for",
+  "with",
+  "that",
+  "this",
+  "from",
+  "have",
+  "been",
+  "were",
+  "their",
+  "there",
+  "about",
+  "would",
+  "could",
+  "should",
+  "into",
+  "while",
+  "where",
+  "which",
+  "when",
+  "what",
+  "your",
+  "than",
+  "then",
+  "they",
+  "them",
+  "because",
+  "very",
+  "much",
+  "many",
+  "some",
+  "also",
+  "just",
+  "only",
+];
+
 function getWords(
   text: string
 ) {
@@ -8,7 +46,58 @@ function getWords(
   return (
     text
       .toLowerCase()
-      .match(/\b\w+\b/g) || []
+
+      .replace(
+        /[^a-z0-9\s]/g,
+        ""
+      )
+
+      .split(/\s+/)
+
+      .filter(
+        (word) =>
+
+          word.length > 2 &&
+
+          !STOP_WORDS.includes(
+            word
+          )
+      )
+
+      .map((word) => {
+
+        if (
+          word.endsWith("ing")
+        ) {
+
+          return word.slice(
+            0,
+            -3
+          );
+        }
+
+        if (
+          word.endsWith("ed")
+        ) {
+
+          return word.slice(
+            0,
+            -2
+          );
+        }
+
+        if (
+          word.endsWith("s")
+        ) {
+
+          return word.slice(
+            0,
+            -1
+          );
+        }
+
+        return word;
+      })
   );
 }
 
@@ -32,6 +121,15 @@ function sentimentScore(
     "success",
     "positive",
     "amazing",
+    "wonderful",
+    "fantastic",
+    "creative",
+    "smart",
+    "powerful",
+    "efficient",
+    "beautiful",
+    "helpful",
+    "impressive",
   ];
 
   const negative = [
@@ -42,45 +140,73 @@ function sentimentScore(
     "negative",
     "failure",
     "awful",
+    "weak",
+    "confusing",
+    "difficult",
+    "problem",
+    "issue",
+    "broken",
+    "annoying",
+    "ugly",
+    "frustrating",
   ];
 
   let score = 0;
 
-  positive.forEach((word) => {
+  positive.forEach(
+    (word) => {
 
-    if (
-      text
-        .toLowerCase()
-        .includes(word)
-    ) {
+      const matches =
+        text
+          .toLowerCase()
+          .match(
+            new RegExp(
+              `\\b${word}\\b`,
+              "gi"
+            )
+          );
 
-      score++;
+      if (matches) {
+
+        score +=
+          matches.length;
+      }
     }
-  });
+  );
 
-  negative.forEach((word) => {
+  negative.forEach(
+    (word) => {
 
-    if (
-      text
-        .toLowerCase()
-        .includes(word)
-    ) {
+      const matches =
+        text
+          .toLowerCase()
+          .match(
+            new RegExp(
+              `\\b${word}\\b`,
+              "gi"
+            )
+          );
 
-      score--;
+      if (matches) {
+
+        score -=
+          matches.length;
+      }
     }
-  });
+  );
 
   return {
+
     label:
-      score > 0
+      score > 1
         ? "Positive"
-        : score < 0
+        : score < -1
         ? "Negative"
         : "Neutral",
 
     score:
       Math.min(
-        Math.abs(score) / 5,
+        Math.abs(score) / 6,
         1
       ) || 0.5,
   };
@@ -127,38 +253,33 @@ export async function POST(
       unique(
         getWords(text2)
       );
-const stopWords = [
-  "the",
-  "and",
-  "for",
-  "with",
-  "that",
-  "this",
-  "from",
-  "have",
-];
-const overlap =
-  words1.filter(
-    (word) =>
-      words2.includes(word) &&
-      word.length > 2 &&
-      !stopWords.includes(word)
-  );
+
+    const overlap =
+      words1.filter(
+        (word) =>
+          words2.includes(word)
+      );
+
+    const overlapSet =
+      [...new Set(overlap)];
 
     const similarity =
       Math.round(
         (
-          overlap.length /
+          overlapSet.length /
+
           Math.max(
-            words1.length,
-            words2.length,
+            (
+              words1.length +
+              words2.length
+            ) / 2,
             1
           )
         ) * 100
       );
 
     const matchingSentences =
-      overlap
+      overlapSet
         .slice(0, 10)
         .map((word) => ({
 
@@ -166,20 +287,28 @@ const overlap =
 
           text1_match:
             text1
-              .split(".")
-              .find((s: string) =>
-                s
-                  .toLowerCase()
-                  .includes(word)
+              .split(/[.!?]/)
+              .find(
+                (
+                  s: string
+                ) =>
+
+                  s
+                    .toLowerCase()
+                    .includes(word)
               ) || "",
 
           text2_match:
             text2
-              .split(".")
-              .find((s: string) =>
-                s
-                  .toLowerCase()
-                  .includes(word)
+              .split(/[.!?]/)
+              .find(
+                (
+                  s: string
+                ) =>
+
+                  s
+                    .toLowerCase()
+                    .includes(word)
               ) || "",
         }));
 
@@ -189,25 +318,29 @@ const overlap =
         similarity,
 
       tone_difference:
-        similarity > 70
+        similarity > 75
           ? "Low"
-          : similarity > 40
+          : similarity > 45
           ? "Moderate"
           : "High",
 
       keyword_overlap:
-        overlap.slice(0, 10),
+        overlapSet.slice(
+          0,
+          12
+        ),
 
       keyword_overlap_score:
         Math.min(
-          overlap.length * 10,
+          overlapSet.length *
+            8,
           100
         ),
 
       plagiarism_risk:
-        similarity > 80
+        similarity > 85
           ? "High"
-          : similarity > 50
+          : similarity > 60
           ? "Moderate"
           : "Low",
 
@@ -226,7 +359,9 @@ const overlap =
     };
 
     return NextResponse.json({
+
       success: true,
+
       data: result,
     });
 
