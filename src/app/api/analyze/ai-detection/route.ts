@@ -83,12 +83,21 @@ function repetitionScore(
 
   const repeated =
     Object.values(counts)
-      .filter((count) => count > 1)
-      .reduce((a, b) => a + b, 0);
+      .filter(
+        (count) =>
+          count > 1
+      )
+      .reduce(
+        (a, b) => a + b,
+        0
+      );
 
   return (
     repeated /
-    Math.max(words.length, 1)
+    Math.max(
+      words.length,
+      1
+    )
   );
 }
 
@@ -105,10 +114,27 @@ export async function POST(
     const cleanText =
       text.trim();
 
+    if (!cleanText) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Text is required",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
     const sentences =
       cleanText
         .split(/[.!?]+/)
-        .filter(Boolean);
+        .filter(
+          (sentence) =>
+            sentence.trim()
+              .length > 0
+        );
 
     const words =
       cleanText
@@ -116,63 +142,93 @@ export async function POST(
         .match(/\b\w+\b/g) || [];
 
     const sentenceCount =
-      sentences.length || 1;
+      Math.max(
+        sentences.length,
+        1
+      );
 
     const wordCount =
-      words.length || 1;
+      Math.max(
+        words.length,
+        1
+      );
 
     const uniqueWords =
-      new Set(words).size || 1;
+      Math.max(
+        new Set(words).size,
+        1
+      );
 
     const avgSentenceLength =
-      wordCount / sentenceCount;
+      wordCount /
+      sentenceCount;
 
     const lexicalDiversity =
-      uniqueWords / wordCount;
+      uniqueWords /
+      wordCount;
 
     const repetition =
-      repetitionScore(words);
+      repetitionScore(
+        words
+      );
 
     const formalCount =
       FORMAL_WORDS.reduce(
-        (total, word) =>
+        (
+          total,
+          word
+        ) =>
           total +
-          (cleanText
-            .toLowerCase()
-            .split(word).length -
-            1),
+          (
+            cleanText
+              .toLowerCase()
+              .split(word)
+              .length - 1
+          ),
         0
       );
 
     const aiPatternCount =
       AI_PATTERNS.reduce(
-        (total, pattern) =>
+        (
+          total,
+          pattern
+        ) =>
           total +
-          (cleanText
-            .toLowerCase()
-            .split(pattern).length -
-            1),
+          (
+            cleanText
+              .toLowerCase()
+              .split(pattern)
+              .length - 1
+          ),
         0
       );
 
     const transitionCount =
       TRANSITION_WORDS.reduce(
-        (total, word) =>
+        (
+          total,
+          word
+        ) =>
           total +
-          (cleanText
-            .toLowerCase()
-            .split(word).length -
-            1),
+          (
+            cleanText
+              .toLowerCase()
+              .split(word)
+              .length - 1
+          ),
         0
       );
 
     const longWords =
       words.filter(
-        (word) => word.length >= 8
+        (word) =>
+          word.length >= 8
       );
 
     const longWordRatio =
-      longWords.length / wordCount;
+      longWords.length /
+      wordCount;
 
     const punctuationDensity =
       (
@@ -191,7 +247,9 @@ export async function POST(
     let uniformityScore = 0;
     let patternScore = 0;
 
-    if (avgSentenceLength >= 24) {
+    if (
+      avgSentenceLength >= 24
+    ) {
       structureScore += 1;
     } else if (
       avgSentenceLength >= 18
@@ -203,7 +261,10 @@ export async function POST(
       structureScore += 0.4;
     }
 
-    if (punctuationDensity < 0.015) {
+    if (
+      punctuationDensity <
+      0.015
+    ) {
       structureScore += 0.3;
     }
 
@@ -221,7 +282,9 @@ export async function POST(
 
     vocabularyScore /= 2;
 
-    if (lexicalDiversity < 0.55) {
+    if (
+      lexicalDiversity < 0.55
+    ) {
       uniformityScore += 1;
     } else if (
       lexicalDiversity < 0.7
@@ -233,7 +296,9 @@ export async function POST(
       uniformityScore += 0.3;
     }
 
-    if (repetition > 0.35) {
+    if (
+      repetition > 0.35
+    ) {
       uniformityScore += 0.3;
     }
 
@@ -277,7 +342,9 @@ export async function POST(
       aiLikelihood += 0.2;
     }
 
-    if (longWordRatio > 0.3) {
+    if (
+      longWordRatio > 0.3
+    ) {
       aiLikelihood += 0.15;
     }
 
@@ -289,7 +356,10 @@ export async function POST(
     }
 
     aiLikelihood = Math.min(
-      Math.max(aiLikelihood, 0),
+      Math.max(
+        aiLikelihood,
+        0
+      ),
       1
     );
 
@@ -299,7 +369,9 @@ export async function POST(
     let prediction =
       "Natural Human Writing Pattern";
 
-    if (aiLikelihood >= 0.8) {
+    if (
+      aiLikelihood >= 0.8
+    ) {
       prediction =
         "Strong AI Writing Signals";
     } else if (
@@ -314,6 +386,31 @@ export async function POST(
         "Mixed Writing Signals";
     }
 
+    const readingEase =
+      Math.max(
+        0,
+        Math.min(
+          100,
+          100 -
+            avgSentenceLength
+        )
+      );
+
+    const gradeLevel =
+      Math.max(
+        1,
+        avgSentenceLength / 2
+      );
+
+    const perplexityIndicator =
+      Math.max(
+        0,
+        (
+          1 -
+          lexicalDiversity
+        ) * 100
+      );
+
     return NextResponse.json({
       success: true,
 
@@ -327,7 +424,8 @@ export async function POST(
       human_writing_likelihood:
         Number(
           (
-            humanLikelihood * 100
+            humanLikelihood *
+            100
           ).toFixed(2)
         ),
 
@@ -344,23 +442,6 @@ export async function POST(
         ),
 
       metrics: {
-        perplexity_indicator: Number(
-  (
-    (1 - lexicalDiversity) *
-    100
-  ).toFixed(2)
-),
-
-        reading_ease: Number(
-  (100 - avgSentenceLength).toFixed(2)
-),
-
-grade_level: Number(
-  (
-    avgSentenceLength / 2
-  ).toFixed(2)
-),
-
         sentence_count:
           sentenceCount,
 
@@ -374,10 +455,25 @@ grade_level: Number(
             )
           ),
 
+        reading_ease:
+          Number(
+            readingEase.toFixed(
+              2
+            )
+          ),
+
+        grade_level:
+          Number(
+            gradeLevel.toFixed(
+              2
+            )
+          ),
+
         lexical_diversity:
           Number(
             (
-              lexicalDiversity * 100
+              lexicalDiversity *
+              100
             ).toFixed(2)
           ),
 
@@ -386,6 +482,21 @@ grade_level: Number(
             (
               repetition * 100
             ).toFixed(2)
+          ),
+
+        long_word_ratio:
+          Number(
+            (
+              longWordRatio *
+              100
+            ).toFixed(2)
+          ),
+
+        perplexity_indicator:
+          Number(
+            perplexityIndicator.toFixed(
+              2
+            )
           ),
 
         formal_word_matches:
@@ -397,17 +508,11 @@ grade_level: Number(
         transition_word_matches:
           transitionCount,
 
-        long_word_ratio:
-          Number(
-            (
-              longWordRatio * 100
-            ).toFixed(2)
-          ),
-
         punctuation_density:
           Number(
             (
-              punctuationDensity * 100
+              punctuationDensity *
+              100
             ).toFixed(2)
           ),
       },
@@ -416,35 +521,40 @@ grade_level: Number(
         structure_score:
           Number(
             (
-              structureScore * 100
+              structureScore *
+              100
             ).toFixed(2)
           ),
 
         vocabulary_score:
           Number(
             (
-              vocabularyScore * 100
+              vocabularyScore *
+              100
             ).toFixed(2)
           ),
 
         readability_score:
           Number(
             (
-              readabilityScore * 100
+              readabilityScore *
+              100
             ).toFixed(2)
           ),
 
         uniformity_score:
           Number(
             (
-              uniformityScore * 100
+              uniformityScore *
+              100
             ).toFixed(2)
           ),
 
         pattern_score:
           Number(
             (
-              patternScore * 100
+              patternScore *
+              100
             ).toFixed(2)
           ),
       },
