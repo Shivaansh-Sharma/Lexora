@@ -192,9 +192,25 @@ case "grammar":
       data?.result?.gradeLevel ||
       data?.gradeLevel ||
       0,
+
+    difficult_words:
+      data?.result?.difficultWords ||
+      data?.difficultWords ||
+      0,
+
+    sentence_count:
+      data?.result?.sentenceCount ||
+      data?.sentenceCount ||
+      0,
+
+    word_count:
+      data?.result?.wordCount ||
+      data?.wordCount ||
+      0,
   };
 
   break;
+  
 case "topic":
 
   normalized = {
