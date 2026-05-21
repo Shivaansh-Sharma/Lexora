@@ -484,7 +484,7 @@ function handleDownloadCSV() {
 
  [];
 
- async function loadAnalysis(
+async function loadAnalysis(
   id: string
 ) {
 
@@ -498,13 +498,204 @@ function handleDownloadCSV() {
     if (
       !response.ok
     ) {
+
       return;
     }
 
     const data =
       await response.json();
 
-    console.log(data);
+    const analysis =
+      data.analysis;
+
+    const rawResult =
+      analysis.result?.analysis ||
+      analysis.result;
+
+    const moduleMap:
+      Record<string, string> = {
+
+      SENTIMENT:
+        "sentiment",
+
+      EMOTION:
+        "emotion",
+
+      NER:
+        "ner",
+
+      SUMMARY:
+        "summarize",
+
+      SUMMARIZE:
+        "summarize",
+
+      READABILITY:
+        "readability",
+
+      KEYWORDS:
+        "keywords",
+
+      LANGUAGE:
+        "language",
+
+      TOPIC:
+        "topic",
+
+      GRAMMAR:
+        "grammar",
+
+      AI_DETECTION:
+        "ai-detection",
+    };
+
+    const moduleType =
+      moduleMap[
+        analysis.type
+      ] || "sentiment";
+
+    setSelectedModule(
+      moduleType
+    );
+
+    setText(
+      analysis.inputText
+    );
+
+    let normalized =
+      rawResult;
+
+    switch (
+      moduleType
+    ) {
+
+      case "grammar":
+
+        normalized = {
+          matches:
+            rawResult?.matches ||
+            rawResult?.analysis
+              ?.matches ||
+            [],
+        };
+
+        break;
+
+      case "emotion":
+
+        normalized =
+          Array.isArray(
+            rawResult
+          )
+            ? rawResult
+            : [];
+
+        break;
+
+      case "ner":
+
+        normalized =
+          Array.isArray(
+            rawResult
+          )
+            ? rawResult
+            : [];
+
+        break;
+
+      case "keywords":
+
+        normalized = {
+          keywords:
+            rawResult?.keywords ||
+            [],
+        };
+
+        break;
+
+      case "summarize":
+
+        normalized = {
+          summary:
+            rawResult?.summary ||
+            "",
+        };
+
+        break;
+
+      case "language":
+
+        normalized = {
+          language:
+            rawResult?.language ||
+            "Unknown",
+
+          code:
+            rawResult?.code ||
+            "unknown",
+
+          confidence:
+            rawResult?.confidence ||
+            0,
+        };
+
+        break;
+
+      case "readability":
+
+        normalized = {
+
+          reading_ease:
+            rawResult?.reading_ease ||
+            rawResult?.readingEase ||
+            0,
+
+          grade_level:
+            rawResult?.grade_level ||
+            rawResult?.gradeLevel ||
+            0,
+
+          sentence_count:
+            rawResult?.sentence_count ||
+            rawResult?.sentenceCount ||
+            0,
+
+          word_count:
+            rawResult?.word_count ||
+            rawResult?.wordCount ||
+            0,
+
+          difficult_words:
+            rawResult?.difficult_words ||
+            rawResult?.difficultWords ||
+            0,
+        };
+
+        break;
+
+      case "sentiment":
+
+        normalized = {
+          label:
+            rawResult?.label ||
+            "Neutral",
+
+          score:
+            rawResult?.score ||
+            0,
+        };
+
+        break;
+
+      default:
+
+        normalized =
+          rawResult;
+    }
+
+    setResult(
+      normalized
+    );
 
   } catch (error) {
 
