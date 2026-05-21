@@ -103,16 +103,18 @@ switch (type) {
 
     break;
 
-  case "emotion":
+case "emotion":
 
-    normalized = {
-      emotions:
-        data?.result ||
-        data ||
-        [],
-    };
+  normalized =
+    Array.isArray(
+      data?.result
+    )
+      ? data.result
+      : Array.isArray(data)
+      ? data
+      : [];
 
-    break;
+  break;
 
 case "language":
 
