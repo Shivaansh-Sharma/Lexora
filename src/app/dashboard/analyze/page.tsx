@@ -775,40 +775,57 @@ onClick={() => {
 )}
 
         {selectedModule === "ner" &&
-  result &&
-  Array.isArray(result.entities) && (
-              <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(124,58,237,0.06)]">
-                <h3 className="text-2xl font-bold tracking-tight">
-                  Named Entities
-                </h3>
+  Array.isArray(result) && (
 
-                <div className="mt-6 grid gap-4 md:grid-cols-2">
-{result.entities.map((entity: any) => (
-                    <div
-                      key={`${entity.entity}-${entity.type}`}
-                      className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]"
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="text-lg font-semibold">
-                            {entity.entity}
-                          </p>
+    <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(124,58,237,0.06)]">
 
-                          <p className="mt-2 text-sm text-muted-foreground">
-                            Extracted entity
-                          </p>
-                        </div>
+      <h3 className="text-2xl font-bold tracking-tight">
+        Named Entities
+      </h3>
 
-                        <div className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-violet-300 backdrop-blur-xl">
-                          {entity.type}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
+
+        {result.length === 0 && (
+
+          <div className="rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-5 text-yellow-200">
+            No entities detected.
+          </div>
+        )}
+
+        {result.map(
+          (
+            entity: any,
+            index: number
+          ) => (
+
+            <div
+              key={`${entity.text}-${entity.label}-${index}`}
+              className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]"
+            >
+
+              <div className="flex items-start justify-between gap-4">
+
+                <div>
+
+                  <p className="text-lg font-semibold">
+                    {entity.text}
+                  </p>
+
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Extracted entity
+                  </p>
+                </div>
+
+                <div className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-violet-300 backdrop-blur-xl">
+                  {entity.label}
                 </div>
               </div>
-            )}
-
+            </div>
+          )
+        )}
+      </div>
+    </div>
+)}
           {selectedModule === "summarize" &&
             result &&
             !Array.isArray(result) &&
