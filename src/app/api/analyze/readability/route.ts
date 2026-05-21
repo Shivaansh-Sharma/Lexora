@@ -1,8 +1,19 @@
 import { NextResponse }
 from "next/server";
 
-import textReadability
-from "text-readability";
+function countSyllables(word: string) {
+
+  word = word.toLowerCase();
+
+  if (word.length <= 3) return 1;
+
+  const matches =
+    word.match(/[aeiouy]{1,2}/g);
+
+  return matches
+    ? matches.length
+    : 1;
+}
 
 export async function POST(
   request: Request
@@ -16,34 +27,63 @@ export async function POST(
     const text =
       body.text || "";
 
+    const sentences =
+      text.split(/[.!?]+/)
+      .filter(Boolean);
+
+    const words =
+      text.match(/\b\w+\b/g)
+      || [];
+
+    const syllables =
+      words.reduce(
+        (total, word) =>
+          total +
+          countSyllables(word),
+        0
+      );
+
+    const sentenceCount =
+      Math.max(
+        sentences.length,
+        1
+      );
+
+    const wordCount =
+      Math.max(
+        words.length,
+        1
+      );
+
     const readingEase =
-      textReadability
-        .fleschReadingEase(
-          text
-        );
+      206.835 -
+      1.015 *
+      (wordCount /
+        sentenceCount) -
+      84.6 *
+      (syllables /
+        wordCount);
 
     const gradeLevel =
-      textReadability
-        .fleschKincaidGrade(
-          text
-        );
+      0.39 *
+        (wordCount /
+          sentenceCount) +
+      11.8 *
+        (syllables /
+          wordCount) -
+      15.59;
 
     return NextResponse.json({
-
       success: true,
 
       readingEase:
         Number(
-          readingEase.toFixed(
-            2
-          )
+          readingEase.toFixed(2)
         ),
 
       gradeLevel:
         Number(
-          gradeLevel.toFixed(
-            2
-          )
+          gradeLevel.toFixed(2)
         ),
     });
 

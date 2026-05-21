@@ -210,22 +210,48 @@ const similarity =
     vector2
   );
 
-    return NextResponse.json({
+const similarityScore =
+  Math.round(similarity * 100);
 
-      success: true,
+return NextResponse.json({
+  success: true,
 
-      similarity:
-        Math.round(
-          similarity * 100
-        ),
+  data: {
+    similarity_score:
+      similarityScore,
 
-      rawSimilarity:
-        Number(
-          similarity.toFixed(
-            4
-          )
-        ),
-    });
+    tone_difference:
+      similarityScore > 75
+        ? "Low"
+        : similarityScore > 45
+        ? "Moderate"
+        : "High",
+
+    keyword_overlap: [],
+
+    keyword_overlap_score:
+      similarityScore,
+
+    plagiarism_risk:
+      similarityScore > 80
+        ? "High"
+        : similarityScore > 50
+        ? "Moderate"
+        : "Low",
+
+    matching_sentences: [],
+
+    text1_sentiment: {
+      label: "Neutral",
+      score: 0.5,
+    },
+
+    text2_sentiment: {
+      label: "Neutral",
+      score: 0.5,
+    },
+  },
+});
 
   } catch (error) {
 

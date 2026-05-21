@@ -74,10 +74,13 @@ export async function analyzeText(
 
   if (!response.ok) {
 
-    throw new Error(
-      data.error ||
-      "Analysis failed"
-    );
+console.error(data);
+
+throw new Error(
+  data.error ||
+  JSON.stringify(data) ||
+  "Analysis failed"
+);
   }
 
 let normalized: Record<string, any> | any = null;

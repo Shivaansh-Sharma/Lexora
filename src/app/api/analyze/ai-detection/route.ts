@@ -448,16 +448,12 @@ const longWords =
 
         lexical_diversity:
           Number(
-            lexicalDiversity.toFixed(
-              4
-            )
+(lexicalDiversity || 0).toFixed(4)
           ),
 
         repetition_score:
           Number(
-            repetition.toFixed(
-              4
-            )
+(repetition || 0).toFixed(4)
           ),
 
         formal_word_matches:
@@ -472,7 +468,7 @@ const longWords =
         long_word_ratio:
           Number(
             (
-              longWordRatio * 100
+              (longWordRatio || 0) * 100
             ).toFixed(2)
           ),
 
