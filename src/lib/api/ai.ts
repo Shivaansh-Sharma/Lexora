@@ -158,16 +158,15 @@ switch (type) {
 
     break;
 
-  case "grammar":
+case "grammar":
 
-    normalized = {
-      matches:
-        data?.result?.matches ||
-        data?.matches ||
-        [],
-    };
+  normalized = {
+    matches:
+      data?.analysis?.matches ||
+      [],
+  };
 
-    break;
+  break;
 
   case "readability":
 
