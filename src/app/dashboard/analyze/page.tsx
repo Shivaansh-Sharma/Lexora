@@ -230,8 +230,6 @@ export default function AnalyzePage() {
 
   const [result, setResult] = useState<any>(null);
 
-  const [plagiarismResult, setPlagiarismResult] = useState<InternetPlagiarismResult | null>(null);
-
   const reportRef = useRef<HTMLDivElement>(null);
 
 function SearchParamsHandler({
@@ -268,7 +266,6 @@ async function handleAnalyze() {
 
     setLoading(true);
 
-    setPlagiarismResult(null);
 
     const response =
       await analyzeText(
@@ -278,15 +275,6 @@ async function handleAnalyze() {
 
     setResult(response.data);
 
-    if (
-  selectedModule ===
-  "internet-plagiarism"
-) {
-
-  setPlagiarismResult(
-    response.data
-  );
-}
 
     if (
       selectedModule !==
@@ -326,9 +314,6 @@ type:
 
       result: {
         analysis: response.data,
-
-        internet_plagiarism:
-          plagiarismResult,
       },
 
       language: "English",
@@ -1324,109 +1309,7 @@ onClick={() => {
       </div>
     </div>
 )}
-{plagiarismResult && (
 
-  <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(124,58,237,0.06)]">
-
-    <div className="flex items-center justify-between">
-
-      <div>
-
-        <h3 className="text-2xl font-semibold">
-          Internet Plagiarism Detection
-        </h3>
-
-        <p className="mt-2 text-muted-foreground">
-          External web similarity analysis.
-        </p>
-      </div>
-
-      <div className="text-right">
-
-        <div className="text-4xl font-bold">
-          {
-            plagiarismResult.internet_plagiarism_score
-          }
-          %
-        </div>
-
-        <div className="text-sm text-muted-foreground">
-          {
-            plagiarismResult.plagiarism_risk
-          }{" "}
-          Risk
-        </div>
-      </div>
-    </div>
-
-    <div className="mt-8 space-y-6">
-
-      {plagiarismResult
-        .matched_sources.length === 0 && (
-
-        <div className="rounded-xl border border-dashed p-8 text-center text-muted-foreground">
-          No strong internet matches found.
-        </div>
-      )}
-
-      {plagiarismResult
-        .matched_sources.map(
-          (
-            source,
-            index
-          ) => (
-
-            <div
-              key={index}
-              className="rounded-2xl border p-6"
-            >
-
-              <div className="flex items-center justify-between gap-4">
-
-                <div className="flex-1">
-
-                  <a
-                    href={source.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="line-clamp-1 text-sm font-medium text-primary underline"
-                  >
-                    {source.url}
-                  </a>
-
-                  <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                    {
-                      source.source_snippet
-                    }
-                  </p>
-                </div>
-
-                <div className="rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold text-primary">
-                  {
-                    source.similarity_score
-                  }
-                  %
-                </div>
-              </div>
-
-              <div className="mt-6 rounded-xl bg-muted/50 p-4">
-
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Matched Input
-                </p>
-
-                <p className="mt-2 text-sm leading-relaxed">
-                  {
-                    source.matched_text
-                  }
-                </p>
-              </div>
-            </div>
-          )
-        )}
-    </div>
-  </div>
-)}
         </div>
       </div>
     </DashboardShell>
