@@ -80,8 +80,7 @@ export async function analyzeText(
     );
   }
 
-  let normalized =
-    null;
+let normalized: Record<string, any> | any = null;
 
   switch (type) {
 
