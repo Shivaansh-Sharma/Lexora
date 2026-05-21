@@ -1201,13 +1201,10 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-            {(
-              ((
-  result.metrics?.repetition_score *
+{(
+  (result.metrics?.repetition_score || 0) *
   100
-).toFixed(2)) * 100
-            ).toFixed(1)}
-            %
+).toFixed(2)}%
           </h4>
         </div>
 
