@@ -1,88 +1,321 @@
-import { NextResponse } from "next/server";
+import { NextResponse }
+from "next/server";
 
-const POSITIVE = [
-  "good",
-  "great",
-  "excellent",
-  "happy",
-  "love",
-  "amazing",
-  "success",
-  "positive",
-  "wonderful",
-"fantastic",
-"impressive",
-"creative",
-"smart",
-"powerful",
-"efficient",
-"beautiful",
-"helpful",
-"excellent",
+const POSITIVE = {
+
+  strong: [
+    "excellent",
+    "amazing",
+    "fantastic",
+    "wonderful",
+    "outstanding",
+    "incredible",
+    "brilliant",
+    "perfect",
+    "exceptional",
+  ],
+
+  medium: [
+    "great",
+    "good",
+    "happy",
+    "love",
+    "success",
+    "positive",
+    "impressive",
+    "creative",
+    "smart",
+    "powerful",
+    "efficient",
+    "beautiful",
+    "helpful",
+    "confident",
+    "excited",
+  ],
+
+  light: [
+    "nice",
+    "pleasant",
+    "decent",
+    "fine",
+    "okay",
+    "satisfied",
+  ],
+};
+
+const NEGATIVE = {
+
+  strong: [
+    "terrible",
+    "awful",
+    "horrible",
+    "disaster",
+    "hate",
+    "broken",
+    "useless",
+    "pathetic",
+  ],
+
+  medium: [
+    "bad",
+    "sad",
+    "negative",
+    "failure",
+    "poor",
+    "weak",
+    "confusing",
+    "difficult",
+    "problem",
+    "issue",
+    "annoying",
+    "frustrating",
+    "ugly",
+  ],
+
+  light: [
+    "slow",
+    "concern",
+    "unclear",
+    "stress",
+    "tired",
+  ],
+};
+
+const NEGATIONS = [
+  "not",
+  "never",
+  "hardly",
+  "barely",
+  "no",
+  "without",
 ];
 
-const NEGATIVE = [
-  "bad",
-  "terrible",
-  "sad",
-  "hate",
-  "awful",
-  "negative",
-  "failure",
-  "poor",
-  "horrible",
-"weak",
-"confusing",
-"difficult",
-"problem",
-"issue",
-"broken",
-"annoying",
-"poor",
-"ugly",
-];
+function countMatches(
+  text: string,
+  words: string[],
+  weight: number
+) {
+
+  let score = 0;
+
+  words.forEach((word) => {
+
+    const regex =
+      new RegExp(
+        `\\b${word}\\b`,
+        "gi"
+      );
+
+    const matches =
+      text.match(regex);
+
+    if (matches) {
+
+      score +=
+        matches.length *
+        weight;
+    }
+  });
+
+  return score;
+}
+
+function applyNegationLogic(
+  text: string,
+  score: number
+) {
+
+  NEGATIONS.forEach(
+    (negation) => {
+
+      const regex =
+        new RegExp(
+          `${negation}\\s+(good|great|excellent|amazing|happy|love)`,
+          "gi"
+        );
+
+      if (
+        regex.test(text)
+      ) {
+
+        score -= 2;
+      }
+    }
+  );
+
+  return score;
+}
 
 export async function POST(
   request: Request
 ) {
+
   try {
-    const body = await request.json();
+
+    const body =
+      await request.json();
+
+    const rawText =
+      body.text || "";
 
     const text =
-      body.text.toLowerCase();
+      rawText.toLowerCase();
 
-    let score = 0;
+    const words =
+      text.match(/\b\w+\b/g)
+      || [];
 
-    POSITIVE.forEach((word) => {
-      if (text.includes(word))
-        score++;
-    });
+    let positiveScore = 0;
+    let negativeScore = 0;
 
-    NEGATIVE.forEach((word) => {
-      if (text.includes(word))
-        score--;
-    });
+    positiveScore +=
+      countMatches(
+        text,
+        POSITIVE.strong,
+        3
+      );
 
-    let label = "Neutral";
+    positiveScore +=
+      countMatches(
+        text,
+        POSITIVE.medium,
+        2
+      );
 
-    if (score > 0)
+    positiveScore +=
+      countMatches(
+        text,
+        POSITIVE.light,
+        1
+      );
+
+    negativeScore +=
+      countMatches(
+        text,
+        NEGATIVE.strong,
+        3
+      );
+
+    negativeScore +=
+      countMatches(
+        text,
+        NEGATIVE.medium,
+        2
+      );
+
+    negativeScore +=
+      countMatches(
+        text,
+        NEGATIVE.light,
+        1
+      );
+
+    positiveScore =
+      applyNegationLogic(
+        text,
+        positiveScore
+      );
+
+    const exclamationBoost =
+      (
+        text.match(/!/g)
+          ?.length || 0
+      ) * 0.4;
+
+    if (
+      positiveScore >
+      negativeScore
+    ) {
+
+      positiveScore +=
+        exclamationBoost;
+    } else {
+
+      negativeScore +=
+        exclamationBoost;
+    }
+
+    const rawDifference =
+      positiveScore -
+      negativeScore;
+
+    let label =
+      "Neutral";
+
+    if (
+      rawDifference > 1.5
+    ) {
       label = "Positive";
+    }
 
-    if (score < 0)
+    if (
+      rawDifference < -1.5
+    ) {
       label = "Negative";
+    }
+
+    const totalSignal =
+      Math.max(
+        positiveScore +
+          negativeScore,
+        1
+      );
+
+    const confidence =
+      Math.min(
+        Math.abs(
+          rawDifference
+        ) / totalSignal,
+        1
+      );
 
     return NextResponse.json({
+
       success: true,
+
       result: {
+
         label,
+
         score:
-          Math.min(
-            Math.abs(score) / 5,
-            1
-          ) || 0.5,
+          Number(
+            confidence.toFixed(
+              2
+            )
+          ),
+
+        positiveScore:
+          Number(
+            positiveScore.toFixed(
+              2
+            )
+          ),
+
+        negativeScore:
+          Number(
+            negativeScore.toFixed(
+              2
+            )
+          ),
+
+        emotionalIntensity:
+          Number(
+            (
+              totalSignal /
+              Math.max(
+                words.length *
+                  0.08,
+                1
+              )
+            ).toFixed(2)
+          ),
       },
     });
-  } catch {
+
+  } catch (error) {
+
+    console.error(error);
+
     return NextResponse.json(
       {
         success: false,
