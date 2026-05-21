@@ -274,8 +274,8 @@ Design characteristics:
 
 # Project Structure
 
+```txt
 src/
-│
 ├── app/
 │   ├── api/
 │   ├── dashboard/
@@ -283,15 +283,11 @@ src/
 │   └── ...
 │
 ├── components/
-│
 ├── lib/
-│
 ├── hooks/
-│
 ├── store/
-│
 └── styles/
-
+```
 ---
 
 # Database
