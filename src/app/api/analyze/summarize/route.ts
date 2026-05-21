@@ -162,16 +162,9 @@ export async function POST(
           }
 
           if (
-            /\b(
-              important|
-              key|
-              significant|
-              recommend|
-              excellent|
-              innovative|
-              powerful|
-              effective
-            )\b/ix.test(sentence)
+            /\b(important|key|significant|recommend|excellent|innovative|powerful|effective)\b/i.test(
+              sentence
+            )
           ) {
             score += 0.8;
           }
