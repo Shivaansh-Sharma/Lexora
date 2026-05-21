@@ -918,7 +918,7 @@ onClick={() => {
                     </p>
 
                     <h4 className="mt-3 text-3xl font-bold">
-                      {result.sentence_count}
+                      {result.sentence_count || result.sentenceCount}
                     </h4>
                   </div>
 
@@ -928,7 +928,7 @@ onClick={() => {
                     </p>
 
                     <h4 className="mt-3 text-3xl font-bold">
-                      {result.word_count}
+                      {result.word_count || result.wordCount}
                     </h4>
                   </div>
 
@@ -1189,7 +1189,7 @@ onClick={() => {
                     </p>
 
                     <h4 className="mt-3 text-2xl font-bold">
-                      {result.reading_ease}
+                      {result.reading_ease || result.readingEase}
                     </h4>
                   </div>
 
@@ -1199,7 +1199,7 @@ onClick={() => {
                     </p>
 
                     <h4 className="mt-3 text-2xl font-bold">
-                      {result.grade_level}
+                      {result.grade_level || result.gradeLevel}
                     </h4>
                   </div>
 
@@ -1333,7 +1333,7 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-            {result.sentence_count}
+            {result.sentence_count || result.sentenceCount}
           </h4>
         </div>
 
@@ -1343,7 +1343,7 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-            {result.word_count}
+            {result.word_count || result.wordCount}
           </h4>
         </div>
 
@@ -1353,7 +1353,7 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-            {result.reading_ease}
+            {result.reading_ease || result.readingEase}
           </h4>
         </div>
 
@@ -1363,7 +1363,7 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-            {result.grade_level}
+            {result.grade_level || result.gradeLevel}
           </h4>
         </div>
       </div>
@@ -1376,7 +1376,7 @@ onClick={() => {
 
           <h4 className="mt-3 text-2xl font-bold">
             {(
-              result.lexical_diversity * 100
+              (result.lexical_diversity || result.lexicalDiversity) * 100
             ).toFixed(1)}
             %
           </h4>
@@ -1389,7 +1389,7 @@ onClick={() => {
 
           <h4 className="mt-3 text-2xl font-bold">
             {(
-              result.repetition_score * 100
+              (result.repetition_score || result.repetitionScore) * 100
             ).toFixed(1)}
             %
           </h4>
@@ -1401,7 +1401,7 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-            {result.long_word_ratio}%
+            {(result.long_word_ratio || result.longWordRatio)}%
           </h4>
         </div>
 
@@ -1411,7 +1411,7 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-lg font-bold">
-            {result.perplexity_indicator}
+            {(result.perplexity_indicator || result.perplexityIndicator)}
           </h4>
         </div>
       </div>

@@ -85,98 +85,147 @@ throw new Error(
 
 let normalized: Record<string, any> | any = null;
 
-  switch (type) {
+switch (type) {
 
-    case "sentiment":
+  case "sentiment":
 
-    case "emotion":
+    normalized = {
+      label:
+        data?.result?.label ||
+        data?.label ||
+        "Neutral",
 
-    case "language":
+      score:
+        data?.result?.score ||
+        data?.score ||
+        0,
+    };
 
-      normalized =
-        data.result;
+    break;
 
-      break;
+  case "emotion":
 
-    case "summarize":
+    normalized = {
+      emotions:
+        data?.result ||
+        data ||
+        [],
+    };
 
-      normalized = {
-        summary:
-          data.summary,
-      };
+    break;
 
-      break;
+  case "language":
 
-    case "ner":
+    normalized = {
+      language:
+        data?.result?.language ||
+        data?.language ||
+        "Unknown",
+    };
 
-      normalized = {
-        entities:
-          data.entities,
-      };
+    break;
 
-      break;
+  case "summarize":
 
-    case "keywords":
+    normalized = {
+      summary:
+        data?.result?.summary ||
+        data?.summary ||
+        "",
+    };
 
-      normalized = {
-        keywords:
-          data.keywords,
-      };
+    break;
 
-      break;
+  case "ner":
 
-    case "grammar":
+    normalized = {
+      entities:
+        data?.result?.entities ||
+        data?.entities ||
+        [],
+    };
 
-      normalized = {
-        matches:
-          data.matches,
-      };
+    break;
 
-      break;
+  case "keywords":
 
-    case "readability":
+    normalized = {
+      keywords:
+        data?.result?.keywords ||
+        data?.keywords ||
+        [],
+    };
 
-      normalized = {
-        readingEase:
-          data.readingEase,
+    break;
 
-        gradeLevel:
-          data.gradeLevel,
-      };
+  case "grammar":
 
-      break;
+    normalized = {
+      matches:
+        data?.result?.matches ||
+        data?.matches ||
+        [],
+    };
 
-    case "topic":
+    break;
 
-      normalized =
-        data.result;
+  case "readability":
 
-      break;
+    normalized = {
+      readingEase:
+        data?.result?.readingEase ||
+        data?.readingEase ||
+        0,
 
-    case "ai-detection":
+      gradeLevel:
+        data?.result?.gradeLevel ||
+        data?.gradeLevel ||
+        0,
+    };
 
-      normalized =
-        data;
+    break;
 
-      break;
+  case "topic":
 
-    case "internet-plagiarism":
+    normalized = {
+      topic:
+        data?.result?.topic ||
+        data?.topic ||
+        "General",
+    };
 
-      normalized = {
-        matches:
-          data.matches,
+    break;
 
-        plagiarism_score:
-          data.plagiarism_score,
-      };
+  case "ai-detection":
 
-      break;
+    normalized =
+      data?.result ||
+      data;
 
-    default:
+    break;
 
-      normalized =
-        data;
-  }
+  case "internet-plagiarism":
+
+    normalized = {
+      matches:
+        data?.result?.matches ||
+        data?.matches ||
+        [],
+
+      plagiarism_score:
+        data?.result?.plagiarism_score ||
+        data?.plagiarism_score ||
+        0,
+    };
+
+    break;
+
+  default:
+
+    normalized =
+      data?.result ||
+      data;
+}
 
   return {
     data: normalized,
