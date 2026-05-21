@@ -1,33 +1,78 @@
 import { NextResponse } from "next/server";
 
 const TOPICS = {
-  technology: [
-    "ai",
+  Technology: [
+    "technology",
     "software",
     "computer",
-    "technology",
+    "internet",
+    "artificial intelligence",
+    "ai",
+    "machine learning",
+    "programming",
     "digital",
+    "data",
+    "cybersecurity",
+    "cloud",
   ],
 
-  health: [
-    "health",
-    "fitness",
-    "exercise",
-    "diet",
-  ],
-
-  finance: [
-    "money",
+  Business: [
+    "business",
+    "marketing",
+    "startup",
     "finance",
     "investment",
-    "bank",
+    "economy",
+    "sales",
+    "management",
+    "entrepreneur",
+    "company",
   ],
 
-  education: [
-    "school",
+  Education: [
     "education",
     "learning",
     "student",
+    "school",
+    "university",
+    "teacher",
+    "academic",
+    "study",
+    "course",
+  ],
+
+  Health: [
+    "health",
+    "medical",
+    "fitness",
+    "exercise",
+    "nutrition",
+    "mental health",
+    "doctor",
+    "disease",
+    "treatment",
+  ],
+
+  Science: [
+    "science",
+    "physics",
+    "chemistry",
+    "biology",
+    "research",
+    "scientific",
+    "laboratory",
+    "experiment",
+  ],
+
+  Politics: [
+    "politics",
+    "government",
+    "policy",
+    "election",
+    "law",
+    "president",
+    "democracy",
+    "minister",
   ],
 };
 
@@ -39,40 +84,67 @@ export async function POST(
       await request.json();
 
     const text =
-      body.text.toLowerCase();
+      (
+        body.text || ""
+      ).toLowerCase();
 
-    const scores:
-      Record<string, number> =
-      {};
+    let bestTopic =
+      "General";
 
-    for (const topic in TOPICS) {
-      scores[topic] = 0;
+    let bestScore = 0;
 
-      TOPICS[
-        topic as keyof typeof TOPICS
-      ].forEach((word) => {
-        if (text.includes(word)) {
-          scores[topic]++;
+    let totalMatches = 0;
+
+    for (const [
+      topic,
+      keywords,
+    ] of Object.entries(
+      TOPICS
+    )) {
+      let score = 0;
+
+      keywords.forEach(
+        (keyword) => {
+          if (
+            text.includes(
+              keyword
+            )
+          ) {
+            score++;
+            totalMatches++;
+          }
         }
-      });
+      );
+
+      if (
+        score > bestScore
+      ) {
+        bestScore = score;
+        bestTopic = topic;
+      }
     }
 
-    const topTopic =
-      Object.entries(scores).sort(
-        (a, b) => b[1] - a[1]
-      )[0];
+    const confidence =
+      totalMatches > 0
+        ? Number(
+            (
+              (bestScore /
+                totalMatches) *
+              100
+            ).toFixed(2)
+          )
+        : 0;
 
     return NextResponse.json({
       success: true,
 
-      topic: topTopic[0],
+      topic: bestTopic,
 
-      confidence:
-        topTopic[1] > 0
-          ? 0.85
-          : 0.4,
+      confidence,
     });
-  } catch {
+  } catch (error) {
+    console.error(error);
+
     return NextResponse.json(
       {
         success: false,
