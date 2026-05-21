@@ -764,80 +764,61 @@ onClick={() => {
                 </div>
               </div>
             )}
-
-          {selectedModule === "emotion" &&
+{selectedModule === "emotion" &&
   result &&
-  !Array.isArray(result) && (
-              <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(124,58,237,0.06)]">
-                <h3 className="text-2xl font-bold tracking-tight">
-                  Emotion Analysis
-                </h3>
+  result.scores && (
 
-                <div className="mt-6 space-y-4">
-{Object.entries(result.scores).map(
-  ([emotion, score]) => (
+    <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl">
 
-    <div
-      key={emotion}
-      className="space-y-2"
-    >
+      <h3 className="text-2xl font-bold">
+        Emotion Analysis
+      </h3>
 
-      <div className="flex items-center justify-between">
+      <div className="mt-8 space-y-6">
 
-        <p className="font-medium capitalize">
-          {emotion}
-        </p>
+        {Object.entries(
+          result.scores
+        ).map(
+          ([emotion, score]) => (
 
-        <p className="text-sm text-muted-foreground">
-          {(Number(score) * 100).toFixed(0)}%
-        </p>
-      </div>
+            <div
+              key={emotion}
+              className="space-y-2"
+            >
 
-      <div className="h-3 overflow-hidden rounded-full bg-muted">
+              <div className="flex items-center justify-between">
 
-        <div
-          className="h-full rounded-full bg-primary"
-          style={{
-            width: `${Number(score) * 100}%`,
-          }}
-        />
+                <p className="font-medium capitalize">
+                  {emotion}
+                </p>
+
+                <p className="text-sm text-muted-foreground">
+
+                  {(
+                    Number(score) * 100
+                  ).toFixed(0)}
+                  %
+
+                </p>
+              </div>
+
+              <div className="h-3 overflow-hidden rounded-full bg-muted">
+
+                <div
+                  className="h-full rounded-full bg-primary"
+                  style={{
+                    width: `${
+                      Number(score) * 100
+                    }%`,
+                  }}
+                />
+              </div>
+            </div>
+          )
+        )}
       </div>
     </div>
-  )
 )}
-                      <div
-                        key={emotion.label}
-                        className="space-y-2"
-                      >
-                        <div className="flex items-center justify-between">
-                          <p className="font-medium capitalize">
-                            {emotion.label}
-                          </p>
-
-                          <p className="text-sm text-muted-foreground">
-                            {(
-                              emotion.score * 100
-                            ).toFixed(2)}
-                            %
-                          </p>
-                        </div>
-
-                        <div className="h-3 overflow-hidden rounded-full bg-muted">
-                          <div
-                            className="h-full rounded-full bg-primary"
-                            style={{
-                              width: `${
-                                emotion.score * 100
-                              }%`,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    )
-                  )}
-                </div>
-              </div>
-            )}
 
         {selectedModule === "ner" &&
   result &&
