@@ -9,6 +9,16 @@ const POSITIVE = [
   "amazing",
   "success",
   "positive",
+  "wonderful",
+"fantastic",
+"impressive",
+"creative",
+"smart",
+"powerful",
+"efficient",
+"beautiful",
+"helpful",
+"excellent",
 ];
 
 const NEGATIVE = [
@@ -20,6 +30,16 @@ const NEGATIVE = [
   "negative",
   "failure",
   "poor",
+  "horrible",
+"weak",
+"confusing",
+"difficult",
+"problem",
+"issue",
+"broken",
+"annoying",
+"poor",
+"ugly",
 ];
 
 export async function POST(

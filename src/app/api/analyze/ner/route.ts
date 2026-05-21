@@ -10,10 +10,10 @@ export async function POST(
     const text =
       body.text || "";
 
-    const entities =
-      text.match(
-        /\b[A-Z][a-z]+(?:\s[A-Z][a-z]+)*\b/g
-      ) || [];
+const entities =
+  text.match(
+    /\b[A-Z][a-z]{2,}(?:\s[A-Z][a-z]{2,})*\b/g
+  ) || [];
 
     return NextResponse.json({
       success: true,

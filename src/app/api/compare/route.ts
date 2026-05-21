@@ -127,13 +127,23 @@ export async function POST(
       unique(
         getWords(text2)
       );
-
-    const overlap =
-      words1.filter(
-        (word) =>
-          words2.includes(word) &&
-          word.length > 4
-      );
+const stopWords = [
+  "the",
+  "and",
+  "for",
+  "with",
+  "that",
+  "this",
+  "from",
+  "have",
+];
+const overlap =
+  words1.filter(
+    (word) =>
+      words2.includes(word) &&
+      word.length > 2 &&
+      !stopWords.includes(word)
+  );
 
     const similarity =
       Math.round(

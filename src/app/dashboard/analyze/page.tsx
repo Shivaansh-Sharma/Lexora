@@ -68,10 +68,6 @@ const modules = [
   key: "ai-detection",
   label: "AI Writing Detection",
   },
-  {
-  key: "internet-plagiarism",
-  label: "Internet Plagiarism Detection",
-},
 ];
 
 type SentimentResult = {
@@ -223,13 +219,6 @@ type MatchedSource = {
   similarity_score: number;
 };
 
-type InternetPlagiarismResult = {
-  internet_plagiarism_score: number;
-
-  plagiarism_risk: string;
-
-  matched_sources: MatchedSource[];
-};
 
 export default function AnalyzePage() {
   const [selectedModule, setSelectedModule] =
@@ -958,39 +947,31 @@ onClick={() => {
             )}
 
           {selectedModule === "keywords" &&
-            Array.isArray(result) && (
-              <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(124,58,237,0.06)]">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-bold tracking-tight">
-                    Extracted Keywords
-                  </h3>
+  result &&
+  Array.isArray(result.keywords) && (
 
-                  <div className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-violet-300 backdrop-blur-xl">
-                    Semantic Keywords
-                  </div>
-                </div>
+    <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl">
 
-                <div className="mt-6 flex flex-wrap gap-3">
-                  {result.map((keyword: KeywordResult) => (
-                    <div
-                      key={keyword.keyword}
-                      className="rounded-full border px-4 py-3"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="font-medium">
-                          {keyword.keyword}
-                        </span>
+      <h3 className="text-2xl font-bold">
+        Extracted Keywords
+      </h3>
 
-                        <span className="text-xs text-muted-foreground">
-                          {(keyword.score * 100).toFixed(1)}%
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+      <div className="mt-8 flex flex-wrap gap-4">
 
+        {result.keywords.map(
+          (keyword: string) => (
+
+            <div
+              key={keyword}
+              className="rounded-full border border-violet-500/20 bg-violet-500/10 px-5 py-3 text-sm font-medium text-violet-300"
+            >
+              {keyword}
+            </div>
+          )
+        )}
+      </div>
+    </div>
+)}
           {selectedModule === "language" &&
             result &&
             !Array.isArray(result) &&
@@ -1027,7 +1008,9 @@ onClick={() => {
                     </p>
 
                     <h4 className="mt-3 text-3xl font-bold">
-                      {(result.confidence * 100).toFixed(2)}%
+                      {{Number(
+  result.confidence || 0
+).toFixed(2)}}%
                     </h4>
                   </div>
                 </div>
@@ -1065,7 +1048,9 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-3xl font-bold">
-            {(result.confidence * 100).toFixed(2)}%
+            {{Number(
+  result.confidence || 0
+).toFixed(2)}}%
           </h4>
         </div>
       </div>
@@ -1073,165 +1058,41 @@ onClick={() => {
 )}
 
           {selectedModule === "grammar" &&
-            result &&
-            !Array.isArray(result) &&
-            result.corrected_text && (
-              <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(124,58,237,0.06)]">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-bold tracking-tight">
-                    Grammar & Writing Analysis
-                  </h3>
+  result &&
+  Array.isArray(result.matches) && (
 
-                  <div className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-violet-300 backdrop-blur-xl">
-                    AI Writing Assistant
-                  </div>
-                </div>
+    <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl">
 
-                <div className="mt-6 rounded-xl border p-5">
-                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Corrected Text
-                  </p>
+      <h3 className="text-2xl font-bold">
+        Grammar Suggestions
+      </h3>
 
-                  <p className="mt-4 leading-8">
-                    {result.corrected_text}
-                  </p>
-                </div>
+      <div className="mt-8 space-y-4">
 
-                <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Total Issues
-                    </p>
+        {result.matches.length === 0 && (
+          <div className="rounded-2xl border border-green-500/20 bg-green-500/10 p-5 text-green-300">
+            No grammar issues detected.
+          </div>
+        )}
 
-                    <h4 className="mt-3 text-3xl font-bold">
-                      {result.issues_found}
-                    </h4>
-                  </div>
+        {result.matches.map(
+          (
+            match: any,
+            index: number
+          ) => (
 
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Grammar Issues
-                    </p>
+            <div
+              key={index}
+              className="rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-5 text-yellow-200"
+            >
+              {match.message}
+            </div>
+          )
+        )}
+      </div>
+    </div>
+)}
 
-                    <h4 className="mt-3 text-3xl font-bold">
-                      {result.grammar_issues}
-                    </h4>
-                  </div>
-
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Spelling Issues
-                    </p>
-
-                    <h4 className="mt-3 text-3xl font-bold">
-                      {result.spelling_issues}
-                    </h4>
-                  </div>
-
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Tone
-                    </p>
-
-                    <h4 className="mt-3 text-3xl font-bold">
-                      {result.tone}
-                    </h4>
-                  </div>
-                </div>
-
-                <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Writing Level
-                    </p>
-
-                    <h4 className="mt-3 text-2xl font-bold">
-                      {result.writing_level}
-                    </h4>
-                  </div>
-
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Reading Ease
-                    </p>
-
-                    <h4 className="mt-3 text-2xl font-bold">
-                      {result.reading_ease || result.readingEase}
-                    </h4>
-                  </div>
-
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Grade Level
-                    </p>
-
-                    <h4 className="mt-3 text-2xl font-bold">
-                      {result.grade_level || result.gradeLevel}
-                    </h4>
-                  </div>
-
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Avg Sentence Length
-                    </p>
-
-                    <h4 className="mt-3 text-2xl font-bold">
-                      {
-                        result.average_sentence_length
-                      }
-                    </h4>
-                  </div>
-                </div>
-
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold">
-                    Detected Issues
-                  </h4>
-
-                  <div className="mt-4 space-y-4">
-                    {result.issues.map(
-                      (
-                        issue: GrammarIssue,
-                        index: number
-                      ) => (
-                        <div
-                          key={index}
-                          className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                              {issue.type}
-                            </span>
-                          </div>
-
-                          <div className="mt-4 grid gap-4 md:grid-cols-2">
-                            <div>
-                              <p className="text-sm text-muted-foreground">
-                                Original
-                              </p>
-
-                              <p className="mt-2 font-medium">
-                                {issue.original || "-"}
-                              </p>
-                            </div>
-
-                            <div>
-                              <p className="text-sm text-muted-foreground">
-                                Suggestion
-                              </p>
-
-                              <p className="mt-2 font-medium">
-                                {issue.suggestion || "-"}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
             {selectedModule === "ai-detection" &&
   result &&
   !Array.isArray(result) &&
@@ -1330,7 +1191,7 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-            {result.grade_level || result.gradeLevel}
+            {result.gradeLevel || result.gradeLevel}
           </h4>
         </div>
       </div>
@@ -1343,7 +1204,10 @@ onClick={() => {
 
           <h4 className="mt-3 text-2xl font-bold">
             {(
-              (result.metrics?.lexical_diversity || result.lexicalDiversity) * 100
+              ((
+  result.metrics?.lexical_diversity *
+  100
+).toFixed(2)) * 100
             ).toFixed(1)}
             %
           </h4>
@@ -1356,7 +1220,10 @@ onClick={() => {
 
           <h4 className="mt-3 text-2xl font-bold">
             {(
-              (result.metrics?.repetition_score || result.repetitionScore) * 100
+              ((
+  result.metrics?.repetition_score *
+  100
+).toFixed(2)) * 100
             ).toFixed(1)}
             %
           </h4>
