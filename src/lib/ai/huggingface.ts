@@ -19,63 +19,119 @@ export async function queryHF(
   payload: any
 ) {
 
+  if (!HF_TOKEN) {
+
+    throw new Error(
+      "HF_TOKEN missing"
+    );
+  }
+
+  const body =
+    typeof payload ===
+    "string"
+
+      ? {
+          inputs: payload,
+        }
+
+      : payload;
+
   for (
     let attempt = 0;
     attempt < 3;
     attempt++
   ) {
 
-    const response =
-      await fetch(
-        `https://api-inference.huggingface.co/models/${model}`,
-        {
-          method: "POST",
+    try {
 
-          headers: {
-            Authorization:
-              `Bearer ${HF_TOKEN}`,
+      const controller =
+        new AbortController();
 
-            "Content-Type":
-              "application/json",
-          },
+      const timeout =
+        setTimeout(
+          () =>
+            controller.abort(),
+          45000
+        );
 
-          body: JSON.stringify(
-            typeof payload ===
-              "string"
+      const response =
+        await fetch(
+          `https://router.huggingface.co/hf-inference/models/${model}`,
+          {
+            method: "POST",
 
-              ? {
-                  inputs:
-                    payload,
-                }
+            headers: {
+              Authorization:
+                `Bearer ${HF_TOKEN}`,
 
-              : payload
-          ),
-        }
+              "Content-Type":
+                "application/json",
+            },
+
+            body: JSON.stringify(
+              body
+            ),
+
+            signal:
+              controller.signal,
+
+            cache:
+              "no-store",
+          }
+        );
+
+      clearTimeout(
+        timeout
       );
 
-    if (
-      response.ok
-    ) {
+      if (
+        response.ok
+      ) {
 
-      return response.json();
-    }
+        return response.json();
+      }
 
-    if (
-      response.status ===
-      503
-    ) {
+      if (
+        response.status ===
+        503
+      ) {
+
+        await sleep(4000);
+
+        continue;
+      }
+
+      const errorText =
+        await response.text();
+
+      console.error(
+        "HF ERROR:",
+        errorText
+      );
+
+      throw new Error(
+        `HF request failed: ${response.status}`
+      );
+
+    } catch (error) {
+
+      console.error(
+        "HF FETCH ERROR:",
+        error
+      );
+
+      if (
+        attempt === 2
+      ) {
+
+        throw error;
+      }
 
       await sleep(3000);
-
-      continue;
     }
-
-    throw new Error(
-      "HuggingFace request failed"
-    );
   }
 
   throw new Error(
-    "Model loading timeout"
+    "HF model timeout"
   );
 }
