@@ -344,6 +344,23 @@ export async function POST(
         ),
 
       metrics: {
+        perplexity_indicator: Number(
+  (
+    (1 - lexicalDiversity) *
+    100
+  ).toFixed(2)
+),
+
+        reading_ease: Number(
+  (100 - avgSentenceLength).toFixed(2)
+),
+
+grade_level: Number(
+  (
+    avgSentenceLength / 2
+  ).toFixed(2)
+),
+
         sentence_count:
           sentenceCount,
 

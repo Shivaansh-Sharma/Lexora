@@ -1188,9 +1188,8 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-{(
-  (result.metrics?.lexical_diversity || 0) *
-  100
+{Number(
+  result.metrics?.lexical_diversity || 0
 ).toFixed(2)}%
           </h4>
         </div>
@@ -1201,9 +1200,8 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-{(
-  (result.metrics?.repetition_score || 0) *
-  100
+{Number(
+  result.metrics?.repetition_score || 0
 ).toFixed(2)}%
           </h4>
         </div>
@@ -1214,7 +1212,9 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-            {(result.long_word_ratio || result.longWordRatio)}%
+            {({Number(
+  result.metrics?.long_word_ratio || 0
+).toFixed(2)}%)}%
           </h4>
         </div>
 
