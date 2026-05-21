@@ -766,15 +766,45 @@ onClick={() => {
             )}
 
           {selectedModule === "emotion" &&
-            Array.isArray(result) && (
+  result &&
+  !Array.isArray(result) && (
               <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(124,58,237,0.06)]">
                 <h3 className="text-2xl font-bold tracking-tight">
                   Emotion Analysis
                 </h3>
 
                 <div className="mt-6 space-y-4">
-                  {result.map(
-                    (emotion: EmotionResult) => (
+{Object.entries(result.scores).map(
+  ([emotion, score]) => (
+
+    <div
+      key={emotion}
+      className="space-y-2"
+    >
+
+      <div className="flex items-center justify-between">
+
+        <p className="font-medium capitalize">
+          {emotion}
+        </p>
+
+        <p className="text-sm text-muted-foreground">
+          {(Number(score) * 100).toFixed(0)}%
+        </p>
+      </div>
+
+      <div className="h-3 overflow-hidden rounded-full bg-muted">
+
+        <div
+          className="h-full rounded-full bg-primary"
+          style={{
+            width: `${Number(score) * 100}%`,
+          }}
+        />
+      </div>
+    </div>
+  )
+)}
                       <div
                         key={emotion.label}
                         className="space-y-2"
@@ -809,23 +839,24 @@ onClick={() => {
               </div>
             )}
 
-          {selectedModule === "ner" &&
-            Array.isArray(result) && (
+        {selectedModule === "ner" &&
+  result &&
+  Array.isArray(result.entities) && (
               <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(124,58,237,0.06)]">
                 <h3 className="text-2xl font-bold tracking-tight">
                   Named Entities
                 </h3>
 
                 <div className="mt-6 grid gap-4 md:grid-cols-2">
-                  {result.map((entity: EntityResult) => (
+{result.entities.map((entity: any) => (
                     <div
-                      key={`${entity.text}-${entity.label}`}
+                      key={`${entity.entity}-${entity.type}`}
                       className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]"
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-lg font-semibold">
-                            {entity.text}
+                            {entity.entity}
                           </p>
 
                           <p className="mt-2 text-sm text-muted-foreground">
@@ -834,7 +865,7 @@ onClick={() => {
                         </div>
 
                         <div className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-violet-300 backdrop-blur-xl">
-                          {entity.label}
+                          {entity.type}
                         </div>
                       </div>
                     </div>
@@ -928,7 +959,7 @@ onClick={() => {
                     </p>
 
                     <h4 className="mt-3 text-3xl font-bold">
-                      {result.word_count || result.wordCount}
+                      {result.metrics?.word_count || result.wordCount}
                     </h4>
                   </div>
 
@@ -1005,7 +1036,7 @@ onClick={() => {
                     </h4>
 
                     <p className="mt-2 text-sm text-muted-foreground uppercase">
-                      {result.language_code}
+                      {result.code}
                     </p>
                   </div>
 
@@ -1022,88 +1053,43 @@ onClick={() => {
               </div>
             )}
 
-          {selectedModule === "topic" &&
-            result &&
-            !Array.isArray(result) &&
-            result.main_category && (
-              <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(124,58,237,0.06)]">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-bold tracking-tight">
-                    Topic Modeling
-                  </h3>
+{selectedModule === "topic" &&
+  result &&
+  !Array.isArray(result) &&
+  result.topic && (
 
-                  <div className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-violet-300 backdrop-blur-xl">
-                    Semantic Analysis
-                  </div>
-                </div>
+    <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(124,58,237,0.06)]">
 
-                <div className="mt-6 grid gap-4 md:grid-cols-2">
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Main Category
-                    </p>
+      <h3 className="text-2xl font-bold tracking-tight">
+        Topic Detection
+      </h3>
 
-                    <h4 className="mt-3 text-3xl font-bold">
-                      {result.main_category}
-                    </h4>
+      <div className="mt-6 grid gap-4 md:grid-cols-2">
 
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      Confidence:{" "}
-                      {(
-                        result.category_confidence * 100
-                      ).toFixed(2)}
-                      %
-                    </p>
-                  </div>
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
 
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Related Categories
-                    </p>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Topic
+          </p>
 
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {result.categories.map(
-                        (category: CategoryItem) => (
-                          <div
-                            key={category.category}
-                            className="rounded-full border px-3 py-2 text-sm"
-                          >
-                            {category.category}
-                          </div>
-                        )
-                      )}
-                    </div>
-                  </div>
-                </div>
+          <h4 className="mt-3 text-3xl font-bold capitalize">
+            {result.topic}
+          </h4>
+        </div>
 
-                <div className="mt-8">
-                  <h4 className="text-lg font-semibold">
-                    Extracted Topics
-                  </h4>
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5">
 
-                  <div className="mt-8 flex flex-wrap items-center gap-4 rounded-[2rem] border border-white/10 bg-white/[0.03] p-4 backdrop-blur-xl">
-                    {result.topics.map(
-                      (topic: TopicItem) => (
-                        <div
-                          key={topic.topic}
-                          className="rounded-full border px-4 py-3"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="font-medium">
-                              {topic.topic}
-                            </span>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Confidence
+          </p>
 
-                            <span className="text-xs text-muted-foreground">
-                              {(topic.score * 100).toFixed(1)}%
-                            </span>
-                          </div>
-                        </div>
-                      )
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+          <h4 className="mt-3 text-3xl font-bold">
+            {(result.confidence * 100).toFixed(2)}%
+          </h4>
+        </div>
+      </div>
+    </div>
+)}
 
           {selectedModule === "grammar" &&
             result &&
@@ -1343,7 +1329,7 @@ onClick={() => {
           </p>
 
           <h4 className="mt-3 text-2xl font-bold">
-            {result.word_count || result.wordCount}
+            {result.metrics?.word_count || result.wordCount}
           </h4>
         </div>
 
@@ -1376,7 +1362,7 @@ onClick={() => {
 
           <h4 className="mt-3 text-2xl font-bold">
             {(
-              (result.lexical_diversity || result.lexicalDiversity) * 100
+              (result.metrics?.lexical_diversity || result.lexicalDiversity) * 100
             ).toFixed(1)}
             %
           </h4>
@@ -1389,7 +1375,7 @@ onClick={() => {
 
           <h4 className="mt-3 text-2xl font-bold">
             {(
-              (result.repetition_score || result.repetitionScore) * 100
+              (result.metrics?.repetition_score || result.repetitionScore) * 100
             ).toFixed(1)}
             %
           </h4>

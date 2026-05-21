@@ -1,34 +1,68 @@
-import { NextResponse }
-from "next/server";
+import { NextResponse } from "next/server";
 
-import { queryHF }
-from "@/lib/ai/huggingface";
+const POSITIVE = [
+  "good",
+  "great",
+  "excellent",
+  "happy",
+  "love",
+  "amazing",
+  "success",
+  "positive",
+];
+
+const NEGATIVE = [
+  "bad",
+  "terrible",
+  "sad",
+  "hate",
+  "awful",
+  "negative",
+  "failure",
+  "poor",
+];
 
 export async function POST(
   request: Request
 ) {
-
   try {
+    const body = await request.json();
 
-    const body =
-      await request.json();
+    const text =
+      body.text.toLowerCase();
 
-    const result =
-      await queryHF(
-        "distilbert/distilbert-base-uncased-finetuned-sst-2-english",
-        body.text
-      );
+    let score = 0;
+
+    POSITIVE.forEach((word) => {
+      if (text.includes(word))
+        score++;
+    });
+
+    NEGATIVE.forEach((word) => {
+      if (text.includes(word))
+        score--;
+    });
+
+    let label = "Neutral";
+
+    if (score > 0)
+      label = "Positive";
+
+    if (score < 0)
+      label = "Negative";
 
     return NextResponse.json({
       success: true,
-      result:
-        result[0],
+      result: {
+        label,
+        score:
+          Math.min(
+            Math.abs(score) / 5,
+            1
+          ) || 0.5,
+      },
     });
-
-  } catch (error) {
-
-    console.error(error);
-
+  } catch {
     return NextResponse.json(
       {
         success: false,

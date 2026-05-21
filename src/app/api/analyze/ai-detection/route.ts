@@ -1,8 +1,6 @@
-import { NextResponse }
-from "next/server";
+import { NextResponse } from "next/server";
 
 const FORMAL_WORDS = [
-
   "furthermore",
   "moreover",
   "consequently",
@@ -33,7 +31,6 @@ const FORMAL_WORDS = [
 ];
 
 const AI_PATTERNS = [
-
   "in today's world",
   "plays a crucial role",
   "it is important to note",
@@ -51,7 +48,6 @@ const AI_PATTERNS = [
 ];
 
 const TRANSITION_WORDS = [
-
   "furthermore",
   "moreover",
   "however",
@@ -66,9 +62,8 @@ function normalizeScore(
   value: number,
   maxValue: number
 ) {
-
   return Math.min(
-    value / maxValue,
+    value / Math.max(maxValue, 1),
     1
   );
 }
@@ -76,45 +71,31 @@ function normalizeScore(
 function repetitionScore(
   words: string[]
 ) {
-
-  const counts:
-    Record<
-      string,
-      number
-    > = {};
+  const counts: Record<
+    string,
+    number
+  > = {};
 
   words.forEach((word) => {
-
     counts[word] =
       (counts[word] || 0) + 1;
   });
 
   const repeated =
     Object.values(counts)
-      .filter(
-        (count) =>
-          count > 1
-      )
-      .reduce(
-        (a, b) => a + b,
-        0
-      );
+      .filter((count) => count > 1)
+      .reduce((a, b) => a + b, 0);
 
   return (
     repeated /
-    Math.max(
-      words.length,
-      1
-    )
+    Math.max(words.length, 1)
   );
 }
 
 export async function POST(
   request: Request
 ) {
-
   try {
-
     const body =
       await request.json();
 
@@ -135,89 +116,63 @@ export async function POST(
         .match(/\b\w+\b/g) || [];
 
     const sentenceCount =
-      sentences.length;
+      sentences.length || 1;
 
     const wordCount =
-      words.length;
+      words.length || 1;
 
     const uniqueWords =
-      new Set(words).size;
+      new Set(words).size || 1;
 
     const avgSentenceLength =
-      wordCount /
-      Math.max(
-        sentenceCount,
-        1
-      );
+      wordCount / sentenceCount;
 
     const lexicalDiversity =
-      uniqueWords /
-      Math.max(
-        wordCount,
-        1
-      );
+      uniqueWords / wordCount;
 
     const repetition =
-      repetitionScore(
-        words
-      );
+      repetitionScore(words);
 
     const formalCount =
       FORMAL_WORDS.reduce(
-        (
-          total,
-          word
-        ) =>
+        (total, word) =>
           total +
-          cleanText
+          (cleanText
             .toLowerCase()
             .split(word).length -
-          1,
+            1),
         0
       );
 
     const aiPatternCount =
       AI_PATTERNS.reduce(
-        (
-          total,
-          pattern
-        ) =>
+        (total, pattern) =>
           total +
-          cleanText
+          (cleanText
             .toLowerCase()
             .split(pattern).length -
-          1,
+            1),
         0
       );
 
     const transitionCount =
       TRANSITION_WORDS.reduce(
-        (
-          total,
-          word
-        ) =>
+        (total, word) =>
           total +
-          cleanText
+          (cleanText
             .toLowerCase()
             .split(word).length -
-          1,
+            1),
         0
       );
 
-const longWords =
-  words.filter(
-    (
-      word: string
-    ) =>
-      word.length >= 8
-  );
+    const longWords =
+      words.filter(
+        (word) => word.length >= 8
+      );
 
     const longWordRatio =
-      longWords.length /
-      Math.max(
-        wordCount,
-        1
-      );
+      longWords.length / wordCount;
 
     const punctuationDensity =
       (
@@ -236,30 +191,19 @@ const longWords =
     let uniformityScore = 0;
     let patternScore = 0;
 
-    if (
-      avgSentenceLength >= 24
-    ) {
-
+    if (avgSentenceLength >= 24) {
       structureScore += 1;
-
     } else if (
       avgSentenceLength >= 18
     ) {
-
       structureScore += 0.7;
-
     } else if (
       avgSentenceLength >= 14
     ) {
-
       structureScore += 0.4;
     }
 
-    if (
-      punctuationDensity <
-      0.015
-    ) {
-
+    if (punctuationDensity < 0.015) {
       structureScore += 0.3;
     }
 
@@ -277,29 +221,19 @@ const longWords =
 
     vocabularyScore /= 2;
 
-    if (
-      lexicalDiversity < 0.55
-    ) {
-
+    if (lexicalDiversity < 0.55) {
       uniformityScore += 1;
-
     } else if (
-      lexicalDiversity < 0.70
+      lexicalDiversity < 0.7
     ) {
-
       uniformityScore += 0.6;
-
     } else if (
       lexicalDiversity < 0.82
     ) {
-
       uniformityScore += 0.3;
     }
 
-    if (
-      repetition > 0.35
-    ) {
-
+    if (repetition > 0.35) {
       uniformityScore += 0.3;
     }
 
@@ -330,29 +264,20 @@ const longWords =
       );
 
     let aiLikelihood =
-
-      structureScore * 0.20 +
-
+      structureScore * 0.2 +
       vocabularyScore * 0.25 +
-
       readabilityScore * 0.25 +
-
       uniformityScore * 0.15 +
-
       patternScore * 0.15;
 
     if (
       formalCount >= 4 &&
       avgSentenceLength > 18
     ) {
-
-      aiLikelihood += 0.20;
+      aiLikelihood += 0.2;
     }
 
-    if (
-      longWordRatio > 0.30
-    ) {
-
+    if (longWordRatio > 0.3) {
       aiLikelihood += 0.15;
     }
 
@@ -360,18 +285,13 @@ const longWords =
       wordCount > 120 &&
       transitionCount >= 3
     ) {
-
-      aiLikelihood += 0.10;
+      aiLikelihood += 0.1;
     }
 
-    aiLikelihood =
-      Math.min(
-        Math.max(
-          aiLikelihood,
-          0
-        ),
-        1
-      );
+    aiLikelihood = Math.min(
+      Math.max(aiLikelihood, 0),
+      1
+    );
 
     const humanLikelihood =
       1 - aiLikelihood;
@@ -379,30 +299,22 @@ const longWords =
     let prediction =
       "Natural Human Writing Pattern";
 
-    if (
-      aiLikelihood >= 0.80
-    ) {
-
+    if (aiLikelihood >= 0.8) {
       prediction =
         "Strong AI Writing Signals";
-
     } else if (
-      aiLikelihood >= 0.60
+      aiLikelihood >= 0.6
     ) {
-
       prediction =
         "Moderate AI Writing Signals";
-
     } else if (
-      aiLikelihood >= 0.40
+      aiLikelihood >= 0.4
     ) {
-
       prediction =
         "Mixed Writing Signals";
     }
 
     return NextResponse.json({
-
       success: true,
 
       ai_writing_likelihood:
@@ -432,7 +344,6 @@ const longWords =
         ),
 
       metrics: {
-
         sentence_count:
           sentenceCount,
 
@@ -448,12 +359,16 @@ const longWords =
 
         lexical_diversity:
           Number(
-(lexicalDiversity || 0).toFixed(4)
+            (
+              lexicalDiversity * 100
+            ).toFixed(2)
           ),
 
         repetition_score:
           Number(
-(repetition || 0).toFixed(4)
+            (
+              repetition * 100
+            ).toFixed(2)
           ),
 
         formal_word_matches:
@@ -468,20 +383,19 @@ const longWords =
         long_word_ratio:
           Number(
             (
-              (longWordRatio || 0) * 100
+              longWordRatio * 100
             ).toFixed(2)
           ),
 
         punctuation_density:
           Number(
-            punctuationDensity.toFixed(
-              4
-            )
+            (
+              punctuationDensity * 100
+            ).toFixed(2)
           ),
       },
 
       analysis_breakdown: {
-
         structure_score:
           Number(
             (
@@ -521,9 +435,7 @@ const longWords =
       disclaimer:
         "Experimental heuristic analysis using linguistic pattern recognition and soft computing techniques.",
     });
-
   } catch (error) {
-
     console.error(error);
 
     return NextResponse.json(

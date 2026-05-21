@@ -1,44 +1,50 @@
-import { NextResponse }
-from "next/server";
-
-import LanguageTool
-from "languagetool-api";
+import { NextResponse } from "next/server";
 
 export async function POST(
   request: Request
 ) {
-
   try {
-
     const body =
       await request.json();
 
-    const result =
-      await LanguageTool.check(
-        body.text
-      );
+    const text =
+      body.text || "";
+
+    const matches = [];
+
+    if (
+      text.includes("  ")
+    ) {
+      matches.push({
+        message:
+          "Double spaces detected",
+      });
+    }
+
+    if (
+      text.length > 0 &&
+      !/[.!?]$/.test(text)
+    ) {
+      matches.push({
+        message:
+          "Sentence may need punctuation",
+      });
+    }
 
     return NextResponse.json({
       success: true,
-      matches:
-        result.matches,
+      matches,
     });
-
-  } catch (error) {
-
-  console.error(error);
-
+  } catch {
     return NextResponse.json(
       {
         success: false,
         error:
           "Grammar analysis failed",
-          
       },
       {
         status: 500,
       }
     );
-    
   }
 }

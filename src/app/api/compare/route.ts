@@ -1,151 +1,89 @@
 import { NextResponse }
 from "next/server";
 
-const HF_TOKEN =
-  process.env.HF_TOKEN;
-
-async function sleep(
-  ms: number
+function getWords(
+  text: string
 ) {
 
-  return new Promise(
-    (resolve) =>
-      setTimeout(
-        resolve,
-        ms
-      )
+  return (
+    text
+      .toLowerCase()
+      .match(/\b\w+\b/g) || []
   );
 }
 
-async function getEmbedding(
-  text: string
+function unique(
+  arr: string[]
 ) {
 
-  const response =
-    await fetch(
-      "https://router.huggingface.co/hf-inference/models/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2",
-      {
-        method: "POST",
-
-        headers: {
-          Authorization:
-            `Bearer ${HF_TOKEN}`,
-
-          "Content-Type":
-            "application/json",
-        },
-
-        body: JSON.stringify({
-          inputs: text,
-        }),
-      }
-    );
-
-  if (!response.ok) {
-
-    throw new Error(
-      "Embedding request failed"
-    );
-  }
-
-  return response.json();
+  return [...new Set(arr)];
 }
 
-async function retryFetch(
+function sentimentScore(
   text: string
 ) {
 
-  for (
-    let i = 0;
-    i < 3;
-    i++
-  ) {
+  const positive = [
+    "good",
+    "great",
+    "excellent",
+    "happy",
+    "love",
+    "success",
+    "positive",
+    "amazing",
+  ];
 
-    try {
+  const negative = [
+    "bad",
+    "sad",
+    "terrible",
+    "hate",
+    "negative",
+    "failure",
+    "awful",
+  ];
 
-      const result =
-        await getEmbedding(
-          text
-        );
+  let score = 0;
 
-      if (
-        Array.isArray(
-          result
-        )
-      ) {
+  positive.forEach((word) => {
 
-        return result;
-      }
+    if (
+      text
+        .toLowerCase()
+        .includes(word)
+    ) {
 
-      if (
-        result.error
-      ) {
-
-        await sleep(3000);
-
-        continue;
-      }
-
-    } catch (error) {
-
-      console.error(error);
-
-      await sleep(3000);
+      score++;
     }
-  }
+  });
 
-  throw new Error(
-    "Embedding failed after retries"
-  );
-}
+  negative.forEach((word) => {
 
-function cosineSimilarity(
-  a: number[],
-  b: number[]
-) {
+    if (
+      text
+        .toLowerCase()
+        .includes(word)
+    ) {
 
-  if (
-    !a.length ||
-    !b.length
-  ) {
+      score--;
+    }
+  });
 
-    return 0;
-  }
+  return {
+    label:
+      score > 0
+        ? "Positive"
+        : score < 0
+        ? "Negative"
+        : "Neutral",
 
-  const dot =
-    a.reduce(
-      (sum, val, i) =>
-        sum + val * b[i],
-      0
-    );
-
-  const magA =
-    Math.sqrt(
-      a.reduce(
-        (sum, val) =>
-          sum + val * val,
-        0
-      )
-    );
-
-  const magB =
-    Math.sqrt(
-      b.reduce(
-        (sum, val) =>
-          sum + val * val,
-        0
-      )
-    );
-
-  if (
-    magA === 0 ||
-    magB === 0
-  ) {
-
-    return 0;
-  }
-
-  return dot / (magA * magB);
+    score:
+      Math.min(
+        Math.abs(score) / 5,
+        1
+      ) || 0.5,
+  };
 }
 
 export async function POST(
@@ -157,9 +95,15 @@ export async function POST(
     const body =
       await request.json();
 
+    const text1 =
+      body.text1 || "";
+
+    const text2 =
+      body.text2 || "";
+
     if (
-      !body.text1 ||
-      !body.text2
+      !text1 ||
+      !text2
     ) {
 
       return NextResponse.json(
@@ -174,84 +118,107 @@ export async function POST(
       );
     }
 
-    const [
-      emb1,
-      emb2,
-    ] = await Promise.all([
-      retryFetch(
-        body.text1
-      ),
-      retryFetch(
-        body.text2
-      ),
-    ]);
+    const words1 =
+      unique(
+        getWords(text1)
+      );
 
-const vector1 =
-  Array.isArray(
-    emb1[0]
-  )
+    const words2 =
+      unique(
+        getWords(text2)
+      );
 
-    ? emb1[0]
+    const overlap =
+      words1.filter(
+        (word) =>
+          words2.includes(word) &&
+          word.length > 4
+      );
 
-    : emb1;
+    const similarity =
+      Math.round(
+        (
+          overlap.length /
+          Math.max(
+            words1.length,
+            words2.length,
+            1
+          )
+        ) * 100
+      );
 
-const vector2 =
-  Array.isArray(
-    emb2[0]
-  )
+    const matchingSentences =
+      overlap
+        .slice(0, 10)
+        .map((word) => ({
 
-    ? emb2[0]
+          keyword: word,
 
-    : emb2;
+          text1_match:
+            text1
+              .split(".")
+              .find((s: string) =>
+                s
+                  .toLowerCase()
+                  .includes(word)
+              ) || "",
 
-const similarity =
-  cosineSimilarity(
-    vector1,
-    vector2
-  );
+          text2_match:
+            text2
+              .split(".")
+              .find((s: string) =>
+                s
+                  .toLowerCase()
+                  .includes(word)
+              ) || "",
+        }));
 
-const similarityScore =
-  Math.round(similarity * 100);
+    const result = {
 
-return NextResponse.json({
-  success: true,
+      similarity_score:
+        similarity,
 
-  data: {
-    similarity_score:
-      similarityScore,
+      tone_difference:
+        similarity > 70
+          ? "Low"
+          : similarity > 40
+          ? "Moderate"
+          : "High",
 
-    tone_difference:
-      similarityScore > 75
-        ? "Low"
-        : similarityScore > 45
-        ? "Moderate"
-        : "High",
+      keyword_overlap:
+        overlap.slice(0, 10),
 
-    keyword_overlap: [],
+      keyword_overlap_score:
+        Math.min(
+          overlap.length * 10,
+          100
+        ),
 
-    keyword_overlap_score:
-      similarityScore,
+      plagiarism_risk:
+        similarity > 80
+          ? "High"
+          : similarity > 50
+          ? "Moderate"
+          : "Low",
 
-    plagiarism_risk:
-      similarityScore > 80
-        ? "High"
-        : similarityScore > 50
-        ? "Moderate"
-        : "Low",
+      matching_sentences:
+        matchingSentences,
 
-    matching_sentences: [],
+      text1_sentiment:
+        sentimentScore(
+          text1
+        ),
 
-    text1_sentiment: {
-      label: "Neutral",
-      score: 0.5,
-    },
+      text2_sentiment:
+        sentimentScore(
+          text2
+        ),
+    };
 
-    text2_sentiment: {
-      label: "Neutral",
-      score: 0.5,
-    },
-  },
-});
+    return NextResponse.json({
+      success: true,
+      data: result,
+    });
 
   } catch (error) {
 

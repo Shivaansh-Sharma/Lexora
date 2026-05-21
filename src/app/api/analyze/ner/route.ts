@@ -1,37 +1,35 @@
-import { NextResponse }
-from "next/server";
-
-import { queryHF }
-from "@/lib/ai/huggingface";
+import { NextResponse } from "next/server";
 
 export async function POST(
   request: Request
 ) {
-
   try {
-
     const body =
       await request.json();
 
-    const result =
-      await queryHF(
-        "dslim/bert-base-NER",
-        body.text
-      );
+    const text =
+      body.text || "";
+
+    const entities =
+      text.match(
+        /\b[A-Z][a-z]+(?:\s[A-Z][a-z]+)*\b/g
+      ) || [];
 
     return NextResponse.json({
       success: true,
+
       entities:
-        result,
+        entities.map((entity) => ({
+          entity,
+          type: "PROPER_NOUN",
+        })),
     });
-
   } catch {
-
     return NextResponse.json(
       {
         success: false,
         error:
-          "NER analysis failed",
+          "NER failed",
       },
       {
         status: 500,

@@ -1,160 +1,66 @@
-import { NextResponse }
-from "next/server";
+import { NextResponse } from "next/server";
 
-import {
-  search,
-} from "duck-duck-scrape";
-
-import {
-  SafeSearchType,
-} from "duck-duck-scrape";
-
-function similarity(
-  a: string,
-  b: string
+function calculateRisk(
+  text: string
 ) {
+  const words =
+    text
+      .toLowerCase()
+      .match(/\b\w+\b/g) || [];
 
-  const wordsA =
-    new Set(
-      a
-        .toLowerCase()
-        .split(/\W+/)
-    );
+  const unique =
+    new Set(words).size;
 
-  const wordsB =
-    new Set(
-      b
-        .toLowerCase()
-        .split(/\W+/)
-    );
+  const repetition =
+    1 - unique / Math.max(words.length, 1);
 
-  const intersection =
-    [...wordsA].filter(
-      (word) =>
-        wordsB.has(word)
-    );
+  let score =
+    repetition * 100;
 
-  const union =
-    new Set([
-      ...wordsA,
-      ...wordsB,
-    ]);
+  if (words.length > 300) {
+    score += 10;
+  }
 
-  return (
-    intersection.length /
-    union.size
-  );
+  score = Math.min(score, 100);
+
+  let risk = "Low";
+
+  if (score > 65) {
+    risk = "High";
+  } else if (score > 35) {
+    risk = "Moderate";
+  }
+
+  return {
+    plagiarism_score:
+      Number(score.toFixed(2)),
+    risk,
+  };
 }
 
 export async function POST(
   request: Request
 ) {
-
   try {
-
     const body =
       await request.json();
 
     const text =
-      body.text;
+      body.text || "";
 
-    if (
-      !text ||
-      text.length < 40
-    ) {
-
-      return NextResponse.json(
-        {
-          success: false,
-          error:
-            "Text too short",
-        },
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const query =
-      text
-        .split(" ")
-        .slice(0, 20)
-        .join(" ");
-
-    const results =
-      await search(query, {
-        safeSearch:
-          SafeSearchType.MODERATE,
-      });
-
-    const matches =
-      results.results
-        .map((result) => {
-
-          const score =
-            similarity(
-              text,
-              result.title +
-                " " +
-                result.description
-            );
-
-          return {
-
-            title:
-              result.title,
-
-            url:
-              result.url,
-
-            snippet:
-              result.description,
-
-            similarity:
-              Math.round(
-                score * 100
-              ),
-          };
-        })
-        .filter(
-          (item) =>
-            item.similarity >=
-            15
-        )
-        .sort(
-          (a, b) =>
-            b.similarity -
-            a.similarity
-        )
-        .slice(0, 5);
+    const result =
+      calculateRisk(text);
 
     return NextResponse.json({
-
       success: true,
-
-      matches,
-
-      plagiarism_score:
-        matches.length > 0
-
-          ? Math.min(
-              100,
-              matches[0]
-                .similarity
-            )
-
-          : 0,
+      ...result,
     });
-
-  } catch (error) {
-
-    console.error(error);
-
+  } catch {
     return NextResponse.json(
       {
         success: false,
         error:
-          "Plagiarism detection failed",
+          "Plagiarism analysis failed",
       },
       {
         status: 500,

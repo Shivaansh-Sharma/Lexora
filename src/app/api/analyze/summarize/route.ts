@@ -1,8 +1,32 @@
 import { NextResponse }
 from "next/server";
 
-import { queryHF }
-from "@/lib/ai/huggingface";
+const STOP_WORDS = [
+  "the",
+  "is",
+  "a",
+  "an",
+  "and",
+  "or",
+  "but",
+  "to",
+  "of",
+  "in",
+  "on",
+  "for",
+  "with",
+  "as",
+  "by",
+  "at",
+  "from",
+  "that",
+  "this",
+  "it",
+  "be",
+  "are",
+  "was",
+  "were",
+];
 
 export async function POST(
   request: Request
@@ -13,22 +37,134 @@ export async function POST(
     const body =
       await request.json();
 
-    const result =
-      await queryHF(
-        "facebook/bart-large-cnn",
-        body.text
-      );
+    const text =
+      body.text || "";
 
-    return NextResponse.json({
-      success: true,
-      summary:
-        result[0]
-          .summary_text,
+    const sentences =
+      text.match(
+        /[^.!?]+[.!?]+/g
+      ) || [];
+
+    if (
+      sentences.length === 0
+    ) {
+
+      return NextResponse.json({
+        success: true,
+        summary: "",
+      });
+    }
+
+    const words =
+      text
+        .toLowerCase()
+        .match(/\b[a-z]{3,}\b/g) || [];
+
+    const frequencies:
+      Record<string, number> =
+      {};
+
+    words.forEach((word) => {
+
+      if (
+        !STOP_WORDS.includes(
+          word
+        )
+      ) {
+
+        frequencies[word] =
+          (frequencies[word] || 0) + 1;
+      }
     });
 
-  } catch (error) {
+    const scored =
+      sentences.map(
+        (sentence) => {
 
-    console.error(error);
+          const sentenceWords =
+            sentence
+              .toLowerCase()
+              .match(
+                /\b[a-z]{3,}\b/g
+              ) || [];
+
+          let score = 0;
+
+          sentenceWords.forEach(
+            (word) => {
+
+              score +=
+                frequencies[
+                  word
+                ] || 0;
+            }
+          );
+
+          return {
+            sentence:
+              sentence.trim(),
+            score,
+          };
+        }
+      );
+
+    let summaryLength = 2;
+
+    if (
+      sentences.length > 8
+    ) {
+
+      summaryLength = 3;
+    }
+
+    if (
+      sentences.length > 15
+    ) {
+
+      summaryLength = 5;
+    }
+
+    if (
+      sentences.length > 30
+    ) {
+
+      summaryLength = 8;
+    }
+
+    const topSentences =
+      scored
+
+        .sort(
+          (a, b) =>
+            b.score - a.score
+        )
+
+        .slice(
+          0,
+          summaryLength
+        )
+
+        .map(
+          (item) =>
+            item.sentence
+        );
+
+    const summary =
+      sentences.filter(
+        (sentence) =>
+          topSentences.includes(
+            sentence.trim()
+          )
+      ).join(" ");
+
+    return NextResponse.json({
+
+      success: true,
+
+      summary,
+    });
+
+  } catch {
 
     return NextResponse.json(
       {
