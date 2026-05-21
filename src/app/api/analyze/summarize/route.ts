@@ -43,6 +43,37 @@ const STOP_WORDS = [
   "their",
 ];
 
+const FEATURE_WORDS = [
+  "battery",
+  "design",
+  "performance",
+  "interface",
+  "tracking",
+  "display",
+  "camera",
+  "speed",
+  "accuracy",
+  "features",
+  "support",
+  "quality",
+  "device",
+  "fitness",
+  "software",
+  "hardware",
+];
+
+const EMOTIONAL_WORDS = [
+  "amazing",
+  "wonderful",
+  "fantastic",
+  "incredible",
+  "perfect",
+  "completely",
+  "truly",
+  "extremely",
+  "highly",
+];
+
 function tokenize(
   text: string
 ) {
@@ -52,6 +83,19 @@ function tokenize(
       .toLowerCase()
       .match(/\b[a-z]{3,}\b/g) || []
   );
+}
+
+function cleanSentence(
+  sentence: string
+) {
+
+  return sentence
+    .replace(
+      /\b(completely|truly|wonderfully|extremely|highly)\b/gi,
+      ""
+    )
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export async function POST(
@@ -144,14 +188,14 @@ export async function POST(
             );
 
           if (index === 0) {
-            score += 1.2;
+            score += 0.8;
           }
 
           if (
             index ===
             sentences.length - 1
           ) {
-            score += 0.4;
+            score += 0.3;
           }
 
           if (
@@ -162,18 +206,56 @@ export async function POST(
           }
 
           if (
-            /\b(important|key|significant|recommend|excellent|innovative|powerful|effective)\b/i.test(
+            /\b(important|key|significant|excellent|innovative|powerful|effective)\b/i.test(
               sentence
             )
           ) {
             score += 0.8;
           }
 
+          FEATURE_WORDS.forEach(
+            (word) => {
+
+              if (
+                sentence
+                  .toLowerCase()
+                  .includes(word)
+              ) {
+
+                score += 0.4;
+              }
+            }
+          );
+
+          EMOTIONAL_WORDS.forEach(
+            (word) => {
+
+              if (
+                sentence
+                  .toLowerCase()
+                  .includes(word)
+              ) {
+
+                score -= 0.15;
+              }
+            }
+          );
+
+          if (
+            /\d/.test(sentence)
+          ) {
+            score += 0.3;
+          }
+
           return {
             sentence:
-              sentence.trim(),
+              cleanSentence(
+                sentence.trim()
+              ),
             score,
             index,
+            words:
+              sentenceWords,
           };
         }
       );
@@ -181,40 +263,69 @@ export async function POST(
     let summaryLength = 2;
 
     if (
-      sentences.length > 8
+      sentences.length > 10
     ) {
       summaryLength = 3;
     }
 
     if (
-      sentences.length > 15
+      sentences.length > 20
     ) {
       summaryLength = 4;
     }
 
-    if (
-      sentences.length > 30
-    ) {
-      summaryLength = 6;
-    }
+    const selected: typeof scored =
+      [];
 
-    const selected =
-      scored
-        .sort(
-          (a, b) =>
-            b.score - a.score
-        )
-        .slice(
-          0,
+    const usedWords =
+      new Set<string>();
+
+    scored
+      .sort(
+        (a, b) =>
+          b.score - a.score
+      )
+      .forEach((item) => {
+
+        if (
+          selected.length >=
           summaryLength
-        )
-        .sort(
-          (a, b) =>
-            a.index - b.index
-        );
+        ) {
+          return;
+        }
+
+        const overlap =
+          item.words.filter(
+            (word) =>
+              usedWords.has(word)
+          ).length;
+
+        const overlapRatio =
+          overlap /
+          Math.max(
+            item.words.length,
+            1
+          );
+
+        if (
+          overlapRatio < 0.6
+        ) {
+
+          selected.push(item);
+
+          item.words.forEach(
+            (word) =>
+              usedWords.add(word)
+          );
+        }
+      });
 
     const summary =
       selected
+        .sort(
+          (a, b) =>
+            a.index - b.index
+        )
         .map(
           (item) =>
             item.sentence
