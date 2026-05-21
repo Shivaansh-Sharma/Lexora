@@ -832,84 +832,87 @@ onClick={() => {
               </div>
             )}
 
-          {selectedModule === "readability" &&
-            result &&
-            !Array.isArray(result) &&
-            result.flesch_reading_ease !== undefined && (
-              <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(124,58,237,0.06)]">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-2xl font-bold tracking-tight">
-                    Readability Analysis
-                  </h3>
+{selectedModule === "readability" &&
+  result &&
+  !Array.isArray(result) &&
+  result.reading_ease !== undefined && (
 
-                  <div className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-violet-300 backdrop-blur-xl">
-                    Academic Metrics
-                  </div>
-                </div>
+    <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl shadow-[0_0_40px_rgba(124,58,237,0.06)]">
 
-                <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Reading Ease
-                    </p>
+      <div className="flex items-center justify-between">
 
-                    <h4 className="mt-3 text-3xl font-bold">
-                      {result.metrics?.reading_ease || 0}
-                    </h4>
-                  </div>
+        <h3 className="text-2xl font-bold tracking-tight">
+          Readability Analysis
+        </h3>
 
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Grade Level
-                    </p>
+        <div className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-violet-300 backdrop-blur-xl">
+          Academic Metrics
+        </div>
+      </div>
 
-                    <h4 className="mt-3 text-3xl font-bold">
-                      {result.metrics?.grade_level || 0}
-                    </h4>
-                  </div>
+      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
 
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Gunning Fog
-                    </p>
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
 
-                    <h4 className="mt-3 text-3xl font-bold">
-                      {result.gunning_fog}
-                    </h4>
-                  </div>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Reading Ease
+          </p>
 
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Sentence Count
-                    </p>
+          <h4 className="mt-3 text-3xl font-bold">
+            {Number(
+              result.reading_ease || 0
+            ).toFixed(2)}
+          </h4>
+        </div>
 
-                    <h4 className="mt-3 text-3xl font-bold">
-                      {result.metrics?.sentence_count || 0}
-                    </h4>
-                  </div>
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
 
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Word Count
-                    </p>
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Grade Level
+          </p>
 
-                    <h4 className="mt-3 text-3xl font-bold">
-                      {result.metrics?.word_count || result.wordCount}
-                    </h4>
-                  </div>
+          <h4 className="mt-3 text-3xl font-bold">
+            {Number(
+              result.grade_level || 0
+            ).toFixed(2)}
+          </h4>
+        </div>
 
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
-                    <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                      Difficult Words
-                    </p>
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
 
-                    <h4 className="mt-3 text-3xl font-bold">
-                      {result.difficult_words}
-                    </h4>
-                  </div>
-                </div>
-              </div>
-            )}
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Sentence Count
+          </p>
+
+          <h4 className="mt-3 text-3xl font-bold">
+            {result.sentence_count || 0}
+          </h4>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
+
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Word Count
+          </p>
+
+          <h4 className="mt-3 text-3xl font-bold">
+            {result.word_count || 0}
+          </h4>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-xl transition-all duration-200 hover:border-violet-500/20 hover:bg-white/[0.05]">
+
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Difficult Words
+          </p>
+
+          <h4 className="mt-3 text-3xl font-bold">
+            {result.difficult_words || 0}
+          </h4>
+        </div>
+      </div>
+    </div>
+)}
 
           {selectedModule === "keywords" &&
   result &&
