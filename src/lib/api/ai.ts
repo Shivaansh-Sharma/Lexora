@@ -185,16 +185,21 @@ switch (type) {
 
     break;
 
-  case "topic":
+case "topic":
 
-    normalized = {
-      topic:
-        data?.result?.topic ||
-        data?.topic ||
-        "General",
-    };
+  normalized = {
+    topic:
+      data?.result?.topic ||
+      data?.topic ||
+      "General",
 
-    break;
+    confidence:
+      data?.result?.confidence ||
+      data?.confidence ||
+      0,
+  };
+
+  break;
 
   case "ai-detection":
 
