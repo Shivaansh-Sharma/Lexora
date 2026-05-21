@@ -2,6 +2,14 @@ import { NextResponse }
 from "next/server";
 
 const STOPWORDS = new Set([
+  "stood",
+"exceeded",
+"unboxed",
+"expectations",
+"smart",
+"watch",
+"design",
+"interface",
   "the",
   "a",
   "an",
