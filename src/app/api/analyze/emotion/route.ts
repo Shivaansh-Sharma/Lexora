@@ -1,64 +1,259 @@
 import { NextResponse }
 from "next/server";
 
-const emotions = {
+const EMOTION_PATTERNS = {
 
-  joy: [
-    "happy",
-    "joy",
-    "love",
-    "excited",
-    "great",
-    "amazing",
-    "wonderful",
-    "fantastic",
-    "excellent",
-    "delighted",
-  ],
+  joy: {
+    strong: [
+      "ecstatic",
+      "thrilled",
+      "overjoyed",
+      "delighted",
+      "euphoric",
+      "celebration",
+      "celebrate",
+      "achievement",
+      "success",
+      "acceptance",
+    ],
 
-  sadness: [
-    "sad",
-    "cry",
-    "depressed",
-    "lonely",
-    "hurt",
-    "miserable",
-  ],
+    medium: [
+      "happy",
+      "joy",
+      "love",
+      "excited",
+      "amazing",
+      "wonderful",
+      "fantastic",
+      "excellent",
+      "great",
+      "positive",
+      "grateful",
+      "smile",
+      "laugh",
+      "warmth",
+      "hopeful",
+    ],
 
-  anger: [
-    "angry",
-    "hate",
-    "furious",
-    "annoyed",
-    "frustrated",
-    "rage",
-  ],
+    light: [
+      "good",
+      "nice",
+      "pleasant",
+      "bright",
+      "relieved",
+      "enjoy",
+    ],
+  },
 
-  fear: [
-    "fear",
-    "afraid",
-    "worried",
-    "anxious",
-    "panic",
-    "nervous",
-  ],
+  sadness: {
+    strong: [
+      "devastated",
+      "heartbroken",
+      "grief",
+      "hopeless",
+      "miserable",
+    ],
 
-  optimism: [
-    "hope",
-    "optimistic",
-    "positive",
-    "confident",
-    "successful",
-    "bright",
-  ],
+    medium: [
+      "sad",
+      "depressed",
+      "lonely",
+      "hurt",
+      "cry",
+      "upset",
+      "pain",
+    ],
 
-  surprise: [
-    "surprised",
-    "shocked",
-    "unexpected",
-    "astonished",
-  ],
+    light: [
+      "disappointed",
+      "tired",
+      "down",
+      "emotional",
+    ],
+  },
+
+  anger: {
+    strong: [
+      "furious",
+      "rage",
+      "outraged",
+      "violent",
+    ],
+
+    medium: [
+      "angry",
+      "hate",
+      "frustrated",
+      "annoyed",
+      "irritated",
+    ],
+
+    light: [
+      "upset",
+      "displeased",
+      "offended",
+    ],
+  },
+
+  fear: {
+    strong: [
+      "terrified",
+      "panic",
+      "horrified",
+    ],
+
+    medium: [
+      "fear",
+      "afraid",
+      "anxious",
+      "worried",
+      "nervous",
+      "uncertain",
+    ],
+
+    light: [
+      "concerned",
+      "uneasy",
+      "stress",
+    ],
+  },
+
+  optimism: {
+    strong: [
+      "confident",
+      "determined",
+      "successful",
+    ],
+
+    medium: [
+      "hope",
+      "optimistic",
+      "positive",
+      "motivated",
+      "inspired",
+      "focused",
+    ],
+
+    light: [
+      "improving",
+      "progress",
+      "growing",
+    ],
+  },
+
+  surprise: {
+    strong: [
+      "shocked",
+      "astonished",
+      "unbelievable",
+    ],
+
+    medium: [
+      "surprised",
+      "unexpected",
+      "suddenly",
+      "sudden",
+      "remarkable",
+    ],
+
+    light: [
+      "different",
+      "unusual",
+      "interesting",
+    ],
+  },
 };
+
+function scoreEmotion(
+  text: string,
+  words: string[],
+  emotion: keyof typeof EMOTION_PATTERNS
+) {
+
+  const categories =
+    EMOTION_PATTERNS[
+      emotion
+    ];
+
+  let score = 0;
+
+  categories.strong.forEach(
+    (word) => {
+
+      const matches =
+        text.match(
+          new RegExp(
+            `\\b${word}\\b`,
+            "gi"
+          )
+        );
+
+      if (matches) {
+        score +=
+          matches.length * 3;
+      }
+    }
+  );
+
+  categories.medium.forEach(
+    (word) => {
+
+      const matches =
+        text.match(
+          new RegExp(
+            `\\b${word}\\b`,
+            "gi"
+          )
+        );
+
+      if (matches) {
+        score +=
+          matches.length * 2;
+      }
+    }
+  );
+
+  categories.light.forEach(
+    (word) => {
+
+      const matches =
+        text.match(
+          new RegExp(
+            `\\b${word}\\b`,
+            "gi"
+          )
+        );
+
+      if (matches) {
+        score +=
+          matches.length;
+      }
+    }
+  );
+
+  const intensityBoost =
+    (
+      text.match(
+        /!+/g
+      )?.length || 0
+    ) * 0.4;
+
+  score += intensityBoost;
+
+  const normalized =
+    Math.min(
+      score /
+        Math.max(
+          words.length * 0.04,
+          1
+        ),
+      1
+    );
+
+  return Number(
+    normalized.toFixed(2)
+  );
+}
 
 export async function POST(
   request: Request
@@ -69,70 +264,48 @@ export async function POST(
     const body =
       await request.json();
 
+    const rawText =
+      body.text || "";
+
     const text =
-      (
-        body.text || ""
-      ).toLowerCase();
+      rawText.toLowerCase();
 
     const words =
       text.match(/\b\w+\b/g)
       || [];
-
-    const totalWords =
-      Math.max(
-        words.length,
-        1
-      );
 
     const result: {
       label: string;
       score: number;
     }[] = [];
 
-    for (const key in emotions) {
+    (
+      Object.keys(
+        EMOTION_PATTERNS
+      ) as Array<
+        keyof typeof EMOTION_PATTERNS
+      >
+    ).forEach(
+      (emotion) => {
 
-      let count = 0;
+        const score =
+          scoreEmotion(
+            text,
+            words,
+            emotion
+          );
 
-      emotions[
-        key as keyof typeof emotions
-      ].forEach(
-        (word) => {
+        if (score > 0) {
 
-          const matches =
-            text.match(
-              new RegExp(
-                `\\b${word}\\b`,
-                "gi"
-              )
-            );
+          result.push({
+            label:
+              emotion,
 
-          if (matches) {
-            count +=
-              matches.length;
-          }
+            score,
+          });
         }
-      );
-
-      if (count > 0) {
-
-        result.push({
-
-          label: key,
-
-          score:
-            Number(
-              Math.min(
-                count /
-                  (
-                    totalWords *
-                    0.08
-                  ),
-                1
-              ).toFixed(2)
-            ),
-        });
       }
-    }
+    );
 
     result.sort(
       (a, b) =>
@@ -144,9 +317,19 @@ export async function POST(
       success: true,
 
       result,
+
+      dominantEmotion:
+        result[0]?.label ||
+        "neutral",
+
+      confidence:
+        result[0]?.score ||
+        0,
     });
 
-  } catch {
+  } catch (error) {
+
+    console.error(error);
 
     return NextResponse.json(
       {
