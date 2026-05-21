@@ -1022,9 +1022,9 @@ onClick={() => {
     </div>
 )}
 
-          {selectedModule === "grammar" &&
+  {selectedModule === "grammar" &&
   result &&
-  Array.isArray(result.matches) && (
+  result.analysis && (
 
     <div className="mt-10 rounded-[2rem] border border-white/10 bg-card/70 p-8 backdrop-blur-xl">
 
@@ -1034,13 +1034,13 @@ onClick={() => {
 
       <div className="mt-8 space-y-4">
 
-        {result.matches.length === 0 && (
+        {result.analysis.matches.length === 0 && (
           <div className="rounded-2xl border border-green-500/20 bg-green-500/10 p-5 text-green-300">
             No grammar issues detected.
           </div>
         )}
 
-        {result.matches.map(
+        {result.analysis.matches.map(
           (
             match: any,
             index: number
