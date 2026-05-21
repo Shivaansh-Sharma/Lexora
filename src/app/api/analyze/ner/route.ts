@@ -15,30 +15,70 @@ const STOP_WORDS = [
   "From",
   "With",
   "Without",
-  "Customer",
-  "Support",
-  "It",
-  "They",
-  "Their",
-  "His",
-  "Her",
-  "Our",
-  "Your",
+  "On",
+  "In",
+  "At",
+  "By",
+  "For",
+  "To",
+  "Consequently",
+  "However",
+  "Meanwhile",
+  "Therefore",
 ];
 
-const COMMON_WORDS = [
-  "watch",
-  "device",
-  "battery",
-  "design",
-  "interface",
-  "features",
-  "tracking",
-  "charge",
-  "routine",
-  "question",
-  "data",
+const PRODUCT_PATTERNS = [
+  /\bsmart watch\b/gi,
+  /\bfitness tracking\b/gi,
+  /\bcustomer support\b/gi,
+  /\bintuitive interface\b/gi,
+  /\bsleek design\b/gi,
 ];
+
+function classifyEntity(
+  entity: string
+) {
+
+  if (
+    /\b(january|february|march|april|may|june|july|august|september|october|november|december)\b/i.test(
+      entity
+    )
+  ) {
+    return "DATE";
+  }
+
+  if (
+    /\b(paris|london|tokyo|berlin|western europe|new york|india|france|germany)\b/i.test(
+      entity
+    )
+  ) {
+    return "LOCATION";
+  }
+
+  if (
+    /\b(exchange|solutions|biotech|corp|inc|ltd|technologies|systems|labs)\b/i.test(
+      entity
+    )
+  ) {
+    return "ORGANIZATION";
+  }
+
+  if (
+    /\$\d+|\b\d+\s?(million|billion|dollars|usd|eur|rupees)\b/i.test(
+      entity
+    )
+  ) {
+    return "MONEY";
+  }
+
+  if (
+    entity.split(" ").length >= 2
+  ) {
+    return "PERSON";
+  }
+
+  return "PROPER_NOUN";
+}
 
 function extractEntities(
   text: string
@@ -78,14 +118,6 @@ function extractEntities(
       }
 
       if (
-        COMMON_WORDS.includes(
-          cleaned.toLowerCase()
-        )
-      ) {
-        return;
-      }
-
-      if (
         seen.has(
           cleaned.toLowerCase()
         )
@@ -100,21 +132,14 @@ function extractEntities(
       entities.push({
         text: cleaned,
         label:
-          "PROPER_NOUN",
+          classifyEntity(
+            cleaned
+          ),
       });
     }
   );
 
-  const productPatterns =
-    [
-      /\bsmart watch\b/gi,
-      /\bfitness tracking\b/gi,
-      /\bcustomer support\b/gi,
-      /\bintuitive interface\b/gi,
-      /\bsleek design\b/gi,
-    ];
-
-  productPatterns.forEach(
+  PRODUCT_PATTERNS.forEach(
     (pattern) => {
 
       const matches =
@@ -147,7 +172,7 @@ function extractEntities(
     }
   );
 
-  return entities.slice(0, 12);
+  return entities.slice(0, 15);
 }
 
 export async function POST(
