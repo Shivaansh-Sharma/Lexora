@@ -191,7 +191,37 @@ function ComparePageContent() {
       const data =
         await response.json();
 
-      setResult(data.data);
+      setResult({
+  similarity_score:
+    data.similarity,
+
+  tone_difference:
+    "Moderate",
+
+  keyword_overlap: [],
+
+  keyword_overlap_score:
+    data.similarity,
+
+  plagiarism_risk:
+    data.similarity > 80
+      ? "High"
+      : data.similarity > 50
+      ? "Moderate"
+      : "Low",
+
+  matching_sentences: [],
+
+  text1_sentiment: {
+    label: "NEUTRAL",
+    score: 0.5,
+  },
+
+  text2_sentiment: {
+    label: "NEUTRAL",
+    score: 0.5,
+  },
+});
 
       await saveComparison({
   text1,
